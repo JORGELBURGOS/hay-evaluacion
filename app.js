@@ -1,4 +1,7 @@
-// Datos cargados directamente (sin fetch)
+// Variable global para almacenar la evaluación actual
+let currentEvaluacion = null;
+
+// Datos integrados (sin necesidad de JSON externos)
 const knowHowData = {
   "competencia_gerencial": {
     "I": "Específica: Ejecución de actividades específicas con interacción limitada.",
@@ -184,18 +187,77 @@ function calcularResultados() {
   const responsabilidad = calcularResponsabilidad(libertad, impacto);
   const resultadoFinal = calcularResultadoFinal(knowHow, solucion, responsabilidad);
 
+  // Guardar evaluación actual
+  currentEvaluacion = {
+    nombre: nombrePuesto,
+    knowHow,
+    solucion,
+    responsabilidad,
+    total: resultadoFinal.total,
+    hayScore: resultadoFinal.hayScore,
+    fecha: new Date().toLocaleString()
+  };
+
   // Mostrar resultados
-  document.getElementById('result-nombre').textContent = nombrePuesto;
-  document.getElementById('result-total').textContent = resultadoFinal.total;
-  document.getElementById('result-hay').textContent = resultadoFinal.hayScore;
-  document.getElementById('result-knowhow').textContent = `${knowHow.puntaje} (${knowHow.gerencial.split(':')[0].trim()})`;
-  document.getElementById('result-solucion').textContent = `${solucion.puntaje} (${solucion.perfil})`;
-  document.getElementById('result-responsabilidad').textContent = `${responsabilidad.puntaje} (${responsabilidad.libertad.split(':')[0].trim()})`;
-  document.getElementById('result-perfil').textContent = solucion.perfil.includes('P') ? 'Perfil Estratégico' : 'Perfil Técnico';
+  document.getElementById('result-nombre').textContent = currentEvaluacion.nombre;
+  document.getElementById('result-total').textContent = currentEvaluacion.total;
+  document.getElementById('result-hay').textContent = currentEvaluacion.hayScore;
+  document.getElementById('result-knowhow').textContent = `${currentEvaluacion.knowHow.puntaje} (${currentEvaluacion.knowHow.gerencial.split(':')[0].trim()})`;
+  document.getElementById('result-solucion').textContent = `${currentEvaluacion.solucion.puntaje} (${currentEvaluacion.solucion.perfil})`;
+  document.getElementById('result-responsabilidad').textContent = `${currentEvaluacion.responsabilidad.puntaje} (${currentEvaluacion.responsabilidad.libertad.split(':')[0].trim()})`;
+  document.getElementById('result-perfil').textContent = currentEvaluacion.solucion.perfil.includes('P') ? 'Perfil Estratégico' : 'Perfil Técnico';
 
   // Mostrar sección de resultados
   document.getElementById('evaluacionForm').classList.add('hidden');
   document.getElementById('resultados').classList.remove('hidden');
+}
+
+// Función para guardar evaluación
+function guardarEvaluacion() {
+  if (!currentEvaluacion) {
+    alert('No hay evaluación para guardar. Calcule primero los resultados.');
+    return;
+  }
+
+  const evaluaciones = JSON.parse(localStorage.getItem('evaluacionesHAY')) || [];
+  evaluaciones.push(currentEvaluacion);
+  localStorage.setItem('evaluacionesHAY', JSON.stringify(evaluaciones));
+  alert('Evaluación guardada correctamente.');
+}
+
+// Función para generar PDF
+function generarPDF() {
+  if (!currentEvaluacion) {
+    alert('No hay resultados para exportar. Calcule primero la evaluación.');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Encabezado
+  doc.setFontSize(18);
+  doc.text('Evaluación HAY - Metodología de Puestos', 105, 20, { align: 'center' });
+
+  // Datos básicos
+  doc.setFontSize(12);
+  doc.text(`Puesto: ${currentEvaluacion.nombre}`, 20, 40);
+  doc.text(`Fecha: ${currentEvaluacion.fecha}`, 20, 50);
+
+  // Resultados
+  doc.setFontSize(14);
+  doc.text('Resultados:', 20, 70);
+  doc.setFontSize(12);
+  doc.text(`Puntaje Total: ${currentEvaluacion.total}`, 20, 80);
+  doc.text(`Nivel HAY: ${currentEvaluacion.hayScore}`, 20, 90);
+
+  // Detalles
+  doc.text(`Know-How: ${currentEvaluacion.knowHow.puntaje} pts`, 20, 110);
+  doc.text(`Solución Problemas: ${currentEvaluacion.solucion.puntaje} pts`, 20, 120);
+  doc.text(`Responsabilidad: ${currentEvaluacion.responsabilidad.puntaje} pts`, 20, 130);
+
+  // Guardar PDF
+  doc.save(`Evaluacion_HAY_${currentEvaluacion.nombre.replace(/ /g, '_')}.pdf`);
 }
 
 // Función para nueva evaluación
@@ -239,3 +301,13 @@ function siguientePaso(pasoDestino) {
   
   mostrarPaso(pasoDestino);
 }
+
+// Cargar tooltips (opcional)
+document.querySelectorAll('.tooltip-icon').forEach(icon => {
+  icon.addEventListener('mouseenter', () => {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = icon.getAttribute('data-tooltip');
+    document.body.appendChild(tooltip);
+  });
+});
