@@ -157,14 +157,14 @@ function calcularResultadoFinal(knowHow, solucion, responsabilidad) {
   const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
 
   function determinarNivelHAY(total) {
-    if (total >= 2100) return "25 - Alta dirección (Estratégico)";
-    if (total >= 1800) return "23-24 - Alta dirección";
-    if (total >= 1500) return "20-22 - Gerentes senior";
-    if (total >= 1200) return "17-19 - Gerentes medios";
-    if (total >= 900) return "14-16 - Supervisores senior";
-    if (total >= 600) return "11-13 - Supervisores";
-    if (total >= 300) return "8-10 - Operativos avanzados";
-    return "1-7 - Operativos básicos";
+    if (total >= 2300) return "25 - Alta Dirección (Estratégico)";
+    if (total >= 1900) return "23-24 - Alta Dirección";
+    if (total >= 1500) return "20-22 - Gerentes Senior";
+    if (total >= 1100) return "17-19 - Gerentes Medios";
+    if (total >= 800) return "14-16 - Supervisores Senior";
+    if (total >= 500) return "11-13 - Supervisores";
+    if (total >= 300) return "8-10 - Operativos Avanzados";
+    return "1-7 - Operativos Básicos";
   }
 
   return { total, hayScore: determinarNivelHAY(total) };
