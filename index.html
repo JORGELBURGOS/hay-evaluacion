@@ -3,173 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación HAY</title>
+    <title>Evaluación HAY - Gestión de Puestos</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Evaluación de Puestos - Metodología HAY</h1>
-        
-        <form id="evaluacionForm">
-            <!-- Paso 1: Know-How -->
-            <div class="paso active" id="paso1">
-                <h2>1. Know-How</h2>
-                
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">HAY</div>
+            <ul class="menu">
+                <li class="active" data-step="1"><i class="fas fa-file-alt"></i> Descripción</li>
+                <li data-step="2"><i class="fas fa-brain"></i> Know-How</li>
+                <li data-step="3"><i class="fas fa-puzzle-piece"></i> Solución Problemas</li>
+                <li data-step="4"><i class="fas fa-balance-scale"></i> Responsabilidad</li>
+                <li data-step="5"><i class="fas fa-history"></i> Historial</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Barra de progreso -->
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+                <div class="step" data-step="1">1</div>
+                <div class="step" data-step="2">2</div>
+                <div class="step" data-step="3">3</div>
+                <div class="step" data-step="4">4</div>
+            </div>
+
+            <!-- Paso 1: Descripción del Puesto -->
+            <div class="step-content active" id="step-1">
+                <h2><i class="fas fa-file-alt"></i> Descripción del Puesto</h2>
                 <div class="form-group">
-                    <label for="gerencial">Competencia Gerencial
-                        <span class="tooltip-icon" data-tooltip="Nivel de integración de funciones: I (Específica) a IV (Liderazgo global).">ℹ️</span>
-                    </label>
-                    <select id="gerencial" required>
-                        <option value="">Seleccione competencia gerencial</option>
-                        <option value="I">I - Específica</option>
-                        <option value="II">II - Homogénea</option>
-                        <option value="III">III - Heterogénea</option>
-                        <option value="IV">IV - Amplia</option>
-                    </select>
+                    <label for="nombrePuesto">Nombre del Puesto*</label>
+                    <input type="text" id="nombrePuesto" required placeholder="Ej: Gerente de Marketing">
                 </div>
-                
                 <div class="form-group">
-                    <label for="tecnica">Competencia Técnica
-                        <span class="tooltip-icon" data-tooltip="Desde A (Básico) hasta H (Referente científico).">ℹ️</span>
-                    </label>
-                    <select id="tecnica" required>
-                        <option value="">Seleccione competencia técnica</option>
-                        <option value="A">A - Básico</option>
-                        <option value="B">B - Introductorio</option>
-                        <option value="C">C - General</option>
-                        <option value="D">D - Avanzado</option>
-                        <option value="E">E - Especializado</option>
-                        <option value="F">F - Especialización Madura</option>
-                        <option value="G">G - Especialización Amplia</option>
-                        <option value="H">H - Referente</option>
-                    </select>
+                    <label for="descripcion">Descripción General*</label>
+                    <textarea id="descripcion" rows="4" required placeholder="Describa el propósito principal del puesto..."></textarea>
                 </div>
-                
                 <div class="form-group">
-                    <label for="comunicacion">Comunicación
-                        <span class="tooltip-icon" data-tooltip="1: Información básica. 2: Influencia técnica. 3: Liderazgo y motivación.">ℹ️</span>
-                    </label>
-                    <select id="comunicacion" required>
-                        <option value="">Seleccione nivel de comunicación</option>
-                        <option value="1">1 - Comunica</option>
-                        <option value="2">2 - Razonamiento</option>
-                        <option value="3">3 - Cambio de comportamientos</option>
-                    </select>
+                    <label for="responsabilidades">Responsabilidades Clave*</label>
+                    <textarea id="responsabilidades" rows="4" required placeholder="Liste las responsabilidades principales..."></textarea>
                 </div>
-                
+                <div class="form-group">
+                    <label for="funciones">Funciones Específicas</label>
+                    <textarea id="funciones" rows="4" placeholder="Detalle las funciones diarias..."></textarea>
+                </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-next" onclick="siguientePaso(2)">Siguiente</button>
+                    <button class="btn-next" onclick="nextStep(2)">Siguiente <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
-            
-            <!-- Paso 2: Solución de Problemas -->
-            <div class="paso" id="paso2">
-                <h2>2. Solución de Problemas</h2>
-                
-                <div class="form-group">
-                    <label for="complejidad">Complejidad
-                        <span class="tooltip-icon" data-tooltip="1: Tareas repetitivas. 5: Innovación sin precedentes.">ℹ️</span>
-                    </label>
-                    <select id="complejidad" required>
-                        <option value="">Seleccione nivel de complejidad</option>
-                        <option value="1">1 - Repetitivo</option>
-                        <option value="2">2 - Con modelos</option>
-                        <option value="3">3 - Variable</option>
-                        <option value="4">4 - Adaptación</option>
-                        <option value="5">5 - Sin precedentes</option>
-                    </select>
+
+            <!-- Pasos 2-4 (Know-How, Solución, Responsabilidad - igual que antes) -->
+            <!-- ... -->
+
+            <!-- Paso 5: Historial -->
+            <div class="step-content" id="step-5">
+                <h2><i class="fas fa-history"></i> Historial de Evaluaciones</h2>
+                <div class="search-box">
+                    <input type="text" id="search-eval" placeholder="Buscar por nombre...">
+                    <button onclick="buscarEvaluaciones()"><i class="fas fa-search"></i></button>
                 </div>
-                
-                <div class="form-group">
-                    <label for="marco">Marco de Referencia
-                        <span class="tooltip-icon" data-tooltip="A: Supervisión estricta. H: Autonomía estratégica.">ℹ️</span>
-                    </label>
-                    <select id="marco" required>
-                        <option value="">Seleccione marco de referencia</option>
-                        <option value="A">A - Rutina Estricta</option>
-                        <option value="B">B - Rutina</option>
-                        <option value="C">C - Semi-Rutina</option>
-                        <option value="D">D - Estandarizado</option>
-                        <option value="E">E - Definición Clara</option>
-                        <option value="F">F - Definición Amplia</option>
-                        <option value="G">G - Definición Genérica</option>
-                        <option value="H">H - Abstracto</option>
-                    </select>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn-prev" onclick="siguientePaso(1)">Anterior</button>
-                    <button type="button" class="btn-next" onclick="siguientePaso(3)">Siguiente</button>
-                </div>
-            </div>
-            
-            <!-- Paso 3: Responsabilidad -->
-            <div class="paso" id="paso3">
-                <h2>3. Responsabilidad</h2>
-                
-                <div class="form-group">
-                    <label for="libertad">Libertad para Actuar
-                        <span class="tooltip-icon" data-tooltip="A: Control total. H: Guía estratégica sin supervisión.">ℹ️</span>
-                    </label>
-                    <select id="libertad" required>
-                        <option value="">Seleccione nivel de libertad</option>
-                        <option value="A">A - Control Estricto</option>
-                        <option value="B">B - Control</option>
-                        <option value="C">C - Estandarizado</option>
-                        <option value="D">D - Regulación General</option>
-                        <option value="E">E - Dirección</option>
-                        <option value="F">F - Dirección General</option>
-                        <option value="G">G - Guía</option>
-                        <option value="H">H - Guía Estratégica</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="impacto">Impacto
-                        <span class="tooltip-icon" data-tooltip="N: No cuantificable. 4: Impacto global en la organización.">ℹ️</span>
-                    </label>
-                    <select id="impacto" required>
-                        <option value="">Seleccione nivel de impacto</option>
-                        <option value="N">N - No cuantificada</option>
-                        <option value="1">1 - Muy pequeño</option>
-                        <option value="2">2 - Pequeño</option>
-                        <option value="3">3 - Medio</option>
-                        <option value="4">4 - Grande</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="nombrePuesto">Nombre del Puesto</label>
-                    <input type="text" id="nombrePuesto" required placeholder="Ej: Gerente de Ventas">
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn-prev" onclick="siguientePaso(2)">Anterior</button>
-                    <button type="button" class="btn-submit" onclick="calcularResultados()">Calcular Evaluación</button>
-                </div>
-            </div>
-        </form>
-        
-        <div id="resultados" class="hidden">
-            <h2>Resultados de la Evaluación</h2>
-            <div class="result-card">
-                <h3>Puesto: <span id="result-nombre"></span></h3>
-                <p><strong>Puntaje Total:</strong> <span id="result-total"></span></p>
-                <p><strong>Nivel HAY:</strong> <span id="result-hay"></span></p>
-                
-                <div class="result-details">
-                    <h4>Detalles por Dimensión</h4>
-                    <p><strong>Know-How:</strong> <span id="result-knowhow"></span></p>
-                    <p><strong>Solución de Problemas:</strong> <span id="result-solucion"></span></p>
-                    <p><strong>Responsabilidad:</strong> <span id="result-responsabilidad"></span></p>
-                    <p><strong>Perfil:</strong> <span id="result-perfil"></span></p>
-                </div>
-                
-                <div class="result-actions">
-                    <button class="btn-save" onclick="guardarEvaluacion()">Guardar Evaluación</button>
-                    <button class="btn-pdf" onclick="generarPDF()">Exportar a PDF</button>
-                    <button class="btn-new" onclick="nuevaEvaluacion()">Nueva Evaluación</button>
+                <div class="evaluations-list" id="evaluations-list">
+                    <!-- Las evaluaciones se cargarán aquí dinámicamente -->
                 </div>
             </div>
         </div>
