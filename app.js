@@ -155,8 +155,19 @@ function calcularResponsabilidad(libertad, impacto) {
 
 function calcularResultadoFinal(knowHow, solucion, responsabilidad) {
     const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
-    const hayScore = Math.floor(total / 100);
-    return { total, hayScore };
+    
+    function determinarNivelHAY(total) {
+        if (total >= 2100) return "25 - Alta dirección (Nivel estratégico)";
+        if (total >= 1600) return "21-24 - Alta dirección";
+        if (total >= 1100) return "16-20 - Gerentes medios";
+        if (total >= 700) return "11-15 - Supervisores/junior";
+        return "8-10 - Puestos operativos básicos";
+    }
+
+    return {
+        total: total,
+        hayScore: determinarNivelHAY(total)
+    };
 }
 
 // Mostrar resultados en pantalla
