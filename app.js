@@ -116,14 +116,14 @@ function calcularKnowHow(gerencial, tecnica, comunicacion) {
 }
 
 function calcularSolucionProblemas(complejidad, marco, knowHowScore) {
-    const puntaje = solucionData.puntajes[marco][complejidad] * 100; // Convertir a escala 100
-    const perfil = determinarPerfilCorto(puntaje, knowHowScore);
-    return {
-        complejidad: solucionData.complejidad[complejidad],
-        marco: solucionData.marco_referencia[marco],
-        puntaje: puntaje,
-        perfil: solucionData.perfil_corto[perfil]
-    };
+  const puntaje = solucionData.puntajes[marco][complejidad]; // ❌ Quita el "* 100"
+  const perfil = determinarPerfilCorto(puntaje, knowHowScore);
+  return {
+    complejidad: solucionData.complejidad[complejidad],
+    marco: solucionData.marco_referencia[marco],
+    puntaje: puntaje,
+    perfil: solucionData.perfil_corto[perfil]
+  };
 }
 
 function determinarPerfilCorto(puntajeSolucion, puntajeKnowHow) {
@@ -154,20 +154,20 @@ function calcularResponsabilidad(libertad, impacto) {
 }
 
 function calcularResultadoFinal(knowHow, solucion, responsabilidad) {
-    const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
-    
-    function determinarNivelHAY(total) {
-        if (total >= 2100) return "25 - Alta dirección (Nivel estratégico)";
-        if (total >= 1600) return "21-24 - Alta dirección";
-        if (total >= 1100) return "16-20 - Gerentes medios";
-        if (total >= 700) return "11-15 - Supervisores/junior";
-        return "8-10 - Puestos operativos básicos";
-    }
+  const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
 
-    return {
-        total: total,
-        hayScore: determinarNivelHAY(total)
-    };
+  function determinarNivelHAY(total) {
+    if (total >= 2100) return "25 - Alta dirección (Estratégico)";
+    if (total >= 1800) return "23-24 - Alta dirección";
+    if (total >= 1500) return "20-22 - Gerentes senior";
+    if (total >= 1200) return "17-19 - Gerentes medios";
+    if (total >= 900) return "14-16 - Supervisores senior";
+    if (total >= 600) return "11-13 - Supervisores";
+    if (total >= 300) return "8-10 - Operativos avanzados";
+    return "1-7 - Operativos básicos";
+  }
+
+  return { total, hayScore: determinarNivelHAY(total) };
 }
 
 // Mostrar resultados en pantalla
