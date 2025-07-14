@@ -1,0 +1,33 @@
+{
+  "competencia_gerencial": {
+    "I": "Específica: Ejecución de actividades específicas con interacción limitada.",
+    "II": "Homogénea: Integración de operaciones relacionadas.",
+    "III": "Heterogénea: Integración de funciones diversas.",
+    "IV": "Amplia: Liderazgo estratégico."
+  },
+  "competencia_tecnica": {
+    "A": "Básico: Conocimientos elementales.",
+    "B": "Introductorio: Rutinas estandarizadas.",
+    "C": "General: Métodos y procedimientos especializados.",
+    "D": "Avanzado: Conocimiento especializado con base práctica.",
+    "E": "Especializado: Basado en teorías y contexto.",
+    "F": "Especialización Madura: Dominio profundo.",
+    "G": "Especialización Amplia: Autoridad reconocida.",
+    "H": "Referente: Liderazgo científico/innovador."
+  },
+  "comunicacion": {
+    "1": "Comunica: Intercambio básico de información.",
+    "2": "Razonamiento: Influencia con argumentos técnicos.",
+    "3": "Cambio de comportamientos: Liderazgo y motivación."
+  },
+  "puntajes": {
+    "A": { "1": 38, "2": 43, "3": 50 },
+    "B": { "1": 50, "2": 57, "3": 66 },
+    "C": { "1": 66, "2": 76, "3": 87 },
+    "D": { "1": 87, "2": 100, "3": 115 },
+    "E": { "1": 115, "2": 132, "3": 152 },
+    "F": { "1": 152, "2": 175, "3": 200 },
+    "G": { "1": 200, "2": 230, "3": 264 },
+    "H": { "1": 264, "2": 304, "3": 350 }
+  }
+}

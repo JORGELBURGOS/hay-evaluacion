@@ -1,0 +1,39 @@
+{
+  "complejidad": {
+    "1": "Repetitivo: Soluciones aprendidas.",
+    "2": "Con modelos: Elección entre alternativas conocidas.",
+    "3": "Variable: Identificación de patrones.",
+    "4": "Adaptación: Soluciones creativas.",
+    "5": "Sin precedentes: Innovación radical."
+  },
+  "marco_referencia": {
+    "A": "Rutina Estricta: Supervisión permanente.",
+    "B": "Rutina: Instrucciones detalladas.",
+    "C": "Semi-Rutina: Procedimientos diversificados.",
+    "D": "Estandarizado: Múltiples precedentes.",
+    "E": "Definición Clara: Políticas específicas.",
+    "F": "Definición Amplia: Objetivos amplios.",
+    "G": "Definición Genérica: Metas organizativas.",
+    "H": "Abstracto: Guía filosófica/estratégica."
+  },
+  "puntajes": {
+    "A": { "1": 0.1, "2": 0.12, "3": 0.14, "4": 0.16, "5": 0.19 },
+    "B": { "1": 0.12, "2": 0.14, "3": 0.16, "4": 0.19, "5": 0.22 },
+    "C": { "1": 0.14, "2": 0.16, "3": 0.19, "4": 0.22, "5": 0.25 },
+    "D": { "1": 0.16, "2": 0.19, "3": 0.22, "4": 0.25, "5": 0.29 },
+    "E": { "1": 0.19, "2": 0.22, "3": 0.25, "4": 0.29, "5": 0.33 },
+    "F": { "1": 0.22, "2": 0.25, "3": 0.29, "4": 0.33, "5": 0.38 },
+    "G": { "1": 0.25, "2": 0.29, "3": 0.33, "4": 0.38, "5": 0.43 },
+    "H": { "1": 0.29, "2": 0.33, "3": 0.38, "4": 0.43, "5": 0.5 }
+  },
+  "perfil_corto": {
+    "P4": "Puntos PS > Puntos AC (Perfil alto en solución de problemas)",
+    "P3": "Puntos PS > Puntos AC",
+    "P2": "Puntos PS > Puntos AC",
+    "P1": "Puntos PS > Puntos AC",
+    "A1": "Puntos AC > Puntos PS (Perfil alto en know-how)",
+    "A2": "Puntos AC > Puntos PS",
+    "A3": "Puntos AC > Puntos PS",
+    "A4": "Puntos AC > Puntos PS"
+  }
+}
