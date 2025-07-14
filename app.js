@@ -1,158 +1,148 @@
-// Variables globales
-let knowHowData, solucionData, responsabilidadData;
-let currentEvaluacion = {};
+// Datos cargados directamente (sin fetch)
+const knowHowData = {
+  "competencia_gerencial": {
+    "I": "Específica: Ejecución de actividades específicas con interacción limitada.",
+    "II": "Homogénea: Integración de operaciones relacionadas.",
+    "III": "Heterogénea: Integración de funciones diversas.",
+    "IV": "Amplia: Liderazgo estratégico."
+  },
+  "competencia_tecnica": {
+    "A": "Básico: Conocimientos elementales.",
+    "B": "Introductorio: Rutinas estandarizadas.",
+    "C": "General: Métodos y procedimientos especializados.",
+    "D": "Avanzado: Conocimiento especializado con base práctica.",
+    "E": "Especializado: Basado en teorías y contexto.",
+    "F": "Especialización Madura: Dominio profundo.",
+    "G": "Especialización Amplia: Autoridad reconocida.",
+    "H": "Referente: Liderazgo científico/innovador."
+  },
+  "comunicacion": {
+    "1": "Comunica: Intercambio básico de información.",
+    "2": "Razonamiento: Influencia con argumentos técnicos.",
+    "3": "Cambio de comportamientos: Liderazgo y motivación."
+  },
+  "puntajes": {
+    "A": { "1": 50, "2": 57, "3": 66 },
+    "B": { "1": 66, "2": 76, "3": 87 },
+    "C": { "1": 87, "2": 100, "3": 115 },
+    "D": { "1": 115, "2": 132, "3": 152 },
+    "E": { "1": 152, "2": 175, "3": 200 },
+    "F": { "1": 200, "2": 230, "3": 264 },
+    "G": { "1": 264, "2": 304, "3": 350 },
+    "H": { "1": 350, "2": 400, "3": 460 }
+  }
+};
 
-// Cargar datos al iniciar
-document.addEventListener('DOMContentLoaded', function() {
-    cargarDatos();
-    mostrarPaso(1);
-    cargarHistorial();
-});
+const solucionData = {
+  "complejidad": {
+    "1": "Repetitivo: Soluciones aprendidas.",
+    "2": "Con modelos: Elección entre alternativas conocidas.",
+    "3": "Variable: Identificación de patrones.",
+    "4": "Adaptación: Soluciones creativas.",
+    "5": "Sin precedentes: Innovación radical."
+  },
+  "marco_referencia": {
+    "A": "Rutina Estricta: Supervisión permanente.",
+    "B": "Rutina: Instrucciones detalladas.",
+    "C": "Semi-Rutina: Procedimientos diversificados.",
+    "D": "Estandarizado: Múltiples precedentes.",
+    "E": "Definición Clara: Políticas específicas.",
+    "F": "Definición Amplia: Objetivos amplios.",
+    "G": "Definición Genérica: Metas organizativas.",
+    "H": "Abstracto: Guía filosófica/estratégica."
+  },
+  "puntajes": {
+    "A": { "1": 50, "2": 57, "3": 66, "4": 76, "5": 87 },
+    "B": { "1": 66, "2": 76, "3": 87, "4": 100, "5": 115 },
+    "C": { "1": 87, "2": 100, "3": 115, "4": 132, "5": 152 },
+    "D": { "1": 115, "2": 132, "3": 152, "4": 175, "5": 200 },
+    "E": { "1": 152, "2": 175, "3": 200, "4": 230, "5": 264 },
+    "F": { "1": 200, "2": 230, "3": 264, "4": 304, "5": 350 },
+    "G": { "1": 264, "2": 304, "3": 350, "4": 400, "5": 460 },
+    "H": { "1": 350, "2": 400, "3": 460, "4": 530, "5": 610 }
+  }
+};
 
-// Cargar datos desde los archivos JSON
-async function cargarDatos() {
-    try {
-        const responses = await Promise.all([
-            fetch('data/know-how.json').then(res => res.json()),
-            fetch('data/solucion-problemas.json').then(res => res.json()),
-            fetch('data/responsabilidad.json').then(res => res.json())
-        ]);
-        
-        [knowHowData, solucionData, responsabilidadData] = responses;
-    } catch (error) {
-        console.error('Error cargando los datos:', error);
-        alert('Error al cargar los datos necesarios. Por favor recarga la página.');
-    }
-}
+const responsabilidadData = {
+  "libertad_actuar": {
+    "A": "Control Estricto: Supervisión permanente.",
+    "B": "Control: Instrucciones establecidas.",
+    "C": "Estandarizado: Procedimientos definidos.",
+    "D": "Regulación General: Políticas claras.",
+    "E": "Dirección: Gestión autónoma.",
+    "F": "Dirección General: Objetivos amplios.",
+    "G": "Guía: Orientación estratégica.",
+    "H": "Guía Estratégica: Tendencias del negocio."
+  },
+  "impacto": {
+    "N": "No cuantificada",
+    "1": "Muy pequeño",
+    "2": "Pequeño",
+    "3": "Medio",
+    "4": "Grande"
+  },
+  "puntajes": {
+    "A": { "N": 50, "1": 66, "2": 87, "3": 115, "4": 152 },
+    "B": { "N": 87, "1": 115, "2": 152, "3": 200, "4": 264 },
+    "C": { "N": 115, "1": 152, "2": 200, "3": 264, "4": 350 },
+    "D": { "N": 152, "1": 200, "2": 264, "3": 350, "4": 460 },
+    "E": { "N": 200, "1": 264, "2": 350, "3": 460, "4": 610 },
+    "F": { "N": 264, "1": 350, "2": 460, "3": 610, "4": 800 },
+    "G": { "N": 350, "1": 460, "2": 610, "3": 800, "4": 1050 },
+    "H": { "N": 460, "1": 610, "2": 800, "3": 1050, "4": 1400 }
+  }
+};
 
-// Navegación entre pasos
-function mostrarPaso(numeroPaso) {
-    document.querySelectorAll('.paso').forEach(paso => {
-        paso.classList.remove('active');
-    });
-    document.getElementById(`paso${numeroPaso}`).classList.add('active');
-}
-
-function siguientePaso(pasoDestino) {
-    const pasoActual = document.querySelector('.paso.active').id.replace('paso', '');
-    
-    // Validar campos antes de avanzar
-    if (pasoDestino > pasoActual) {
-        const formulario = document.getElementById('evaluacionForm');
-        const inputs = document.querySelectorAll(`#paso${pasoActual} [required]`);
-        let valido = true;
-        
-        inputs.forEach(input => {
-            if (!input.value) {
-                input.style.borderColor = 'red';
-                valido = false;
-            } else {
-                input.style.borderColor = '#ddd';
-            }
-        });
-        
-        // Validaciones específicas
-        if (pasoActual == 2) {
-            const complejidad = document.getElementById('complejidad').value;
-            const marco = document.getElementById('marco').value;
-            
-            // Validar combinación imposible: Complejidad 5 con Marco A
-            if (complejidad == '5' && marco == 'A') {
-                alert('Combinación no válida: "Sin precedentes" no puede combinarse con "Rutina Estricta".');
-                valido = false;
-            }
-        }
-        
-        if (!valido) {
-            alert('Por favor complete todos los campos requeridos correctamente.');
-            return;
-        }
-    }
-    
-    mostrarPaso(pasoDestino);
-}
-
-// Cálculos principales
-function calcularResultados() {
-    // Obtener valores del formulario
-    const gerencial = document.getElementById('gerencial').value;
-    const tecnica = document.getElementById('tecnica').value;
-    const comunicacion = document.getElementById('comunicacion').value;
-    const complejidad = document.getElementById('complejidad').value;
-    const marco = document.getElementById('marco').value;
-    const libertad = document.getElementById('libertad').value;
-    const impacto = document.getElementById('impacto').value;
-    const nombrePuesto = document.getElementById('nombrePuesto').value;
-    
-    // Realizar cálculos
-    const knowHow = calcularKnowHow(gerencial, tecnica, comunicacion);
-    const solucion = calcularSolucionProblemas(complejidad, marco, knowHow.puntaje);
-    const responsabilidad = calcularResponsabilidad(libertad, impacto);
-    const resultadoFinal = calcularResultadoFinal(knowHow, solucion, responsabilidad);
-    
-    // Guardar en objeto global
-    currentEvaluacion = {
-        nombre: nombrePuesto,
-        knowHow,
-        solucion,
-        responsabilidad,
-        total: resultadoFinal.total,
-        hayScore: resultadoFinal.hayScore,
-        fecha: new Date().toLocaleString()
-    };
-    
-    // Mostrar resultados
-    mostrarResultados(currentEvaluacion);
-}
-
+// Función para calcular Know-How
 function calcularKnowHow(gerencial, tecnica, comunicacion) {
-    const puntaje = knowHowData.puntajes[tecnica][comunicacion];
-    return {
-        gerencial: knowHowData.competencia_gerencial[gerencial],
-        tecnica: knowHowData.competencia_tecnica[tecnica],
-        comunicacion: knowHowData.comunicacion[comunicacion],
-        puntaje: puntaje
-    };
+  const puntaje = knowHowData.puntajes[tecnica][comunicacion];
+  return {
+    gerencial: knowHowData.competencia_gerencial[gerencial],
+    tecnica: knowHowData.competencia_tecnica[tecnica],
+    comunicacion: knowHowData.comunicacion[comunicacion],
+    puntaje: puntaje
+  };
 }
 
+// Función para calcular Solución de Problemas
 function calcularSolucionProblemas(complejidad, marco, knowHowScore) {
-  const puntaje = solucionData.puntajes[marco][complejidad]; // ❌ Quita el "* 100"
+  const puntaje = solucionData.puntajes[marco][complejidad];
   const perfil = determinarPerfilCorto(puntaje, knowHowScore);
   return {
     complejidad: solucionData.complejidad[complejidad],
     marco: solucionData.marco_referencia[marco],
     puntaje: puntaje,
-    perfil: solucionData.perfil_corto[perfil]
+    perfil: perfil
   };
 }
 
+// Función para determinar perfil corto
 function determinarPerfilCorto(puntajeSolucion, puntajeKnowHow) {
-    const diferencia = puntajeSolucion - puntajeKnowHow;
-    
-    if (diferencia > 0) {
-        // Perfil alto en solución de problemas (P)
-        if (diferencia > 150) return 'P4';
-        if (diferencia > 100) return 'P3';
-        if (diferencia > 50) return 'P2';
-        return 'P1';
-    } else {
-        // Perfil alto en know-how (A)
-        if (diferencia < -150) return 'A4';
-        if (diferencia < -100) return 'A3';
-        if (diferencia < -50) return 'A2';
-        return 'A1';
-    }
+  const diferencia = puntajeSolucion - puntajeKnowHow;
+  if (diferencia > 0) {
+    if (diferencia > 150) return 'P4';
+    if (diferencia > 100) return 'P3';
+    if (diferencia > 50) return 'P2';
+    return 'P1';
+  } else {
+    if (diferencia < -150) return 'A4';
+    if (diferencia < -100) return 'A3';
+    if (diferencia < -50) return 'A2';
+    return 'A1';
+  }
 }
 
+// Función para calcular Responsabilidad
 function calcularResponsabilidad(libertad, impacto) {
-    const puntaje = responsabilidadData.puntajes[libertad][impacto];
-    return {
-        libertad: responsabilidadData.libertad_actuar[libertad],
-        impacto: responsabilidadData.impacto[impacto],
-        puntaje: puntaje
-    };
+  const puntaje = responsabilidadData.puntajes[libertad][impacto];
+  return {
+    libertad: responsabilidadData.libertad_actuar[libertad],
+    impacto: responsabilidadData.impacto[impacto],
+    puntaje: puntaje
+  };
 }
 
+// Función para calcular el resultado final
 function calcularResultadoFinal(knowHow, solucion, responsabilidad) {
   const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
 
@@ -170,159 +160,82 @@ function calcularResultadoFinal(knowHow, solucion, responsabilidad) {
   return { total, hayScore: determinarNivelHAY(total) };
 }
 
-// Mostrar resultados en pantalla
-function mostrarResultados(evaluacion) {
-    document.getElementById('result-nombre').textContent = evaluacion.nombre;
-    document.getElementById('result-total').textContent = evaluacion.total;
-    document.getElementById('result-hay').textContent = evaluacion.hayScore;
-    document.getElementById('result-knowhow').textContent = `${evaluacion.knowHow.puntaje} (${evaluacion.knowHow.gerencial.split(':')[0]})`;
-    document.getElementById('result-solucion').textContent = `${evaluacion.solucion.puntaje} (${evaluacion.solucion.perfil})`;
-    document.getElementById('result-responsabilidad').textContent = `${evaluacion.responsabilidad.puntaje} (${evaluacion.responsabilidad.libertad.split(':')[0]})`;
-    document.getElementById('result-perfil').textContent = evaluacion.solucion.perfil.includes('P') ? 'Perfil Estratégico' : 'Perfil Técnico';
-    
-    // Mostrar interpretación del nivel HAY
-    let interpretacion = '';
-    if (evaluacion.hayScore >= 21) {
-        interpretacion = 'Alta dirección';
-    } else if (evaluacion.hayScore >= 16) {
-        interpretacion = 'Gerentes medios';
-    } else if (evaluacion.hayScore >= 11) {
-        interpretacion = 'Supervisores/junior';
-    } else {
-        interpretacion = 'Puestos operativos básicos';
-    }
-    
-    document.getElementById('result-hay').textContent += ` - ${interpretacion}`;
-    
-    // Mostrar sección de resultados
-    document.getElementById('evaluacionForm').classList.add('hidden');
-    document.getElementById('resultados').classList.remove('hidden');
-    document.getElementById('historial').classList.remove('hidden');
+// Función principal llamada desde el HTML
+function calcularResultados() {
+  // Obtener valores del formulario
+  const gerencial = document.getElementById('gerencial').value;
+  const tecnica = document.getElementById('tecnica').value;
+  const comunicacion = document.getElementById('comunicacion').value;
+  const complejidad = document.getElementById('complejidad').value;
+  const marco = document.getElementById('marco').value;
+  const libertad = document.getElementById('libertad').value;
+  const impacto = document.getElementById('impacto').value;
+  const nombrePuesto = document.getElementById('nombrePuesto').value;
+
+  // Validar campos vacíos
+  if (!gerencial || !tecnica || !comunicacion || !complejidad || !marco || !libertad || !impacto || !nombrePuesto) {
+    alert('Por favor complete todos los campos.');
+    return;
+  }
+
+  // Calcular dimensiones
+  const knowHow = calcularKnowHow(gerencial, tecnica, comunicacion);
+  const solucion = calcularSolucionProblemas(complejidad, marco, knowHow.puntaje);
+  const responsabilidad = calcularResponsabilidad(libertad, impacto);
+  const resultadoFinal = calcularResultadoFinal(knowHow, solucion, responsabilidad);
+
+  // Mostrar resultados
+  document.getElementById('result-nombre').textContent = nombrePuesto;
+  document.getElementById('result-total').textContent = resultadoFinal.total;
+  document.getElementById('result-hay').textContent = resultadoFinal.hayScore;
+  document.getElementById('result-knowhow').textContent = `${knowHow.puntaje} (${knowHow.gerencial.split(':')[0].trim()})`;
+  document.getElementById('result-solucion').textContent = `${solucion.puntaje} (${solucion.perfil})`;
+  document.getElementById('result-responsabilidad').textContent = `${responsabilidad.puntaje} (${responsabilidad.libertad.split(':')[0].trim()})`;
+  document.getElementById('result-perfil').textContent = solucion.perfil.includes('P') ? 'Perfil Estratégico' : 'Perfil Técnico';
+
+  // Mostrar sección de resultados
+  document.getElementById('evaluacionForm').classList.add('hidden');
+  document.getElementById('resultados').classList.remove('hidden');
 }
 
-// Guardar evaluación en localStorage
-function guardarEvaluacion() {
-    if (!currentEvaluacion.nombre) {
-        alert('No hay evaluación para guardar.');
-        return;
-    }
-    
-    const evaluaciones = JSON.parse(localStorage.getItem('evaluacionesHAY')) || [];
-    evaluaciones.push(currentEvaluacion);
-    localStorage.setItem('evaluacionesHAY', JSON.stringify(evaluaciones));
-    
-    alert('Evaluación guardada correctamente.');
-    cargarHistorial();
-}
-
-// Cargar historial de evaluaciones
-function cargarHistorial() {
-    const evaluaciones = JSON.parse(localStorage.getItem('evaluacionesHAY')) || [];
-    const lista = document.getElementById('lista-evaluaciones');
-    lista.innerHTML = '';
-    
-    if (evaluaciones.length === 0) {
-        lista.innerHTML = '<li>No hay evaluaciones guardadas</li>';
-        return;
-    }
-    
-    evaluaciones.forEach((eval, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <div>
-                <strong>${eval.nombre}</strong> - HAY ${eval.hayScore}
-                <small>${eval.fecha}</small>
-            </div>
-            <button onclick="eliminarEvaluacion(${index})">Eliminar</button>
-        `;
-        lista.appendChild(li);
-    });
-}
-
-// Eliminar evaluación del historial
-function eliminarEvaluacion(index) {
-    if (confirm('¿Está seguro de eliminar esta evaluación?')) {
-        const evaluaciones = JSON.parse(localStorage.getItem('evaluacionesHAY')) || [];
-        evaluaciones.splice(index, 1);
-        localStorage.setItem('evaluacionesHAY', JSON.stringify(evaluaciones));
-        cargarHistorial();
-    }
-}
-
-// Generar PDF
-function generarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    const evaluacion = currentEvaluacion;
-    const fecha = new Date().toLocaleDateString();
-    
-    // Encabezado
-    doc.setFontSize(18);
-    doc.text('Evaluación HAY - Metodología de Puestos', 105, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text(`Puesto: ${evaluacion.nombre}`, 14, 25);
-    doc.text(`Fecha: ${fecha}`, 14, 32);
-    
-    // Resultados principales
-    doc.setFontSize(14);
-    doc.text('Resultados Principales', 14, 45);
-    doc.setFontSize(12);
-    doc.text(`Puntaje Total: ${evaluacion.total}`, 14, 55);
-    doc.text(`Nivel HAY: ${evaluacion.hayScore}`, 14, 62);
-    
-    // Detalles por dimensión
-    doc.setFontSize(14);
-    doc.text('Detalles por Dimensión', 14, 75);
-    doc.setFontSize(12);
-    
-    doc.text(`Know-How: ${evaluacion.knowHow.puntaje} puntos`, 14, 85);
-    doc.text(`• ${evaluacion.knowHow.gerencial}`, 20, 92);
-    doc.text(`• ${evaluacion.knowHow.tecnica}`, 20, 99);
-    doc.text(`• ${evaluacion.knowHow.comunicacion}`, 20, 106);
-    
-    doc.text(`Solución de Problemas: ${evaluacion.solucion.puntaje} puntos`, 14, 117);
-    doc.text(`• ${evaluacion.solucion.complejidad}`, 20, 124);
-    doc.text(`• ${evaluacion.solucion.marco}`, 20, 131);
-    doc.text(`• Perfil: ${evaluacion.solucion.perfil}`, 20, 138);
-    
-    doc.text(`Responsabilidad: ${evaluacion.responsabilidad.puntaje} puntos`, 14, 149);
-    doc.text(`• ${evaluacion.responsabilidad.libertad}`, 20, 156);
-    doc.text(`• ${evaluacion.responsabilidad.impacto}`, 20, 163);
-    
-    // Interpretación
-    doc.setFontSize(14);
-    doc.text('Interpretación', 14, 176);
-    doc.setFontSize(12);
-    
-    let interpretacion = '';
-    if (evaluacion.hayScore >= 21) {
-        interpretacion = 'Este puesto corresponde a niveles de Alta Dirección, con responsabilidad estratégica y toma de decisiones complejas.';
-    } else if (evaluacion.hayScore >= 16) {
-        interpretacion = 'Este puesto corresponde a Gerentes Medios, con responsabilidad sobre departamentos o áreas funcionales.';
-    } else if (evaluacion.hayScore >= 11) {
-        interpretacion = 'Este puesto corresponde a Supervisores o profesionales junior, con responsabilidad sobre procesos específicos.';
-    } else {
-        interpretacion = 'Este puesto corresponde a niveles operativos básicos, con tareas rutinarias y supervisión cercana.';
-    }
-    
-    doc.text(interpretacion, 14, 186, { maxWidth: 180 });
-    
-    // Perfil
-    const perfil = evaluacion.solucion.perfil.includes('P') ? 
-        'El puesto tiene un perfil más estratégico, con mayor énfasis en solución de problemas complejos.' : 
-        'El puesto tiene un perfil más técnico, con mayor énfasis en conocimiento especializado.';
-    
-    doc.text(perfil, 14, 200, { maxWidth: 180 });
-    
-    // Guardar PDF
-    doc.save(`Evaluacion_HAY_${evaluacion.nombre.replace(/ /g, '_')}.pdf`);
-}
-
-// Nueva evaluación
+// Función para nueva evaluación
 function nuevaEvaluacion() {
-    document.getElementById('evaluacionForm').reset();
-    document.getElementById('evaluacionForm').classList.remove('hidden');
-    document.getElementById('resultados').classList.add('hidden');
-    mostrarPaso(1);
+  document.getElementById('evaluacionForm').reset();
+  document.getElementById('evaluacionForm').classList.remove('hidden');
+  document.getElementById('resultados').classList.add('hidden');
+  mostrarPaso(1);
+}
+
+// Función para navegar entre pasos
+function mostrarPaso(numeroPaso) {
+  document.querySelectorAll('.paso').forEach(paso => {
+    paso.classList.remove('active');
+  });
+  document.getElementById(`paso${numeroPaso}`).classList.add('active');
+}
+
+function siguientePaso(pasoDestino) {
+  const pasoActual = parseInt(document.querySelector('.paso.active').id.replace('paso', ''));
+  
+  // Validar campos antes de avanzar
+  if (pasoDestino > pasoActual) {
+    const inputs = document.querySelectorAll(`#paso${pasoActual} [required]`);
+    let valido = true;
+    
+    inputs.forEach(input => {
+      if (!input.value) {
+        input.style.borderColor = 'red';
+        valido = false;
+      } else {
+        input.style.borderColor = '#ddd';
+      }
+    });
+    
+    if (!valido) {
+      alert('Por favor complete todos los campos requeridos.');
+      return;
+    }
+  }
+  
+  mostrarPaso(pasoDestino);
 }
