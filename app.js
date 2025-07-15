@@ -99,22 +99,6 @@ const responsabilidadData = {
 // VARIABLES GLOBALES
 // =============================================
 let currentEvaluation = null;
-const evaluationModel = {
-    id: null,
-    nombre: "",
-    departamento: "",
-    nivelReporte: "",
-    descripcion: "",
-    responsabilidades: "",
-    funciones: "",
-    competencias: "",
-    knowHow: {},
-    solucion: {},
-    responsabilidad: {},
-    total: 0,
-    hayScore: "",
-    fecha: null
-};
 
 // =============================================
 // FUNCIÓN PARA RESETEAR EL FORMULARIO
@@ -182,12 +166,6 @@ function showStep(step) {
     const menuItem = document.querySelector(`.menu li[data-step="${step}"]`);
     if (menuItem) menuItem.classList.add('active');
     
-    // Resetear progreso si es nueva evaluación
-    if (step === 'evaluation') {
-        document.getElementById('progress').style.width = '0%';
-        resetWizard();
-    }
-    
     // Inicializar reportes si es necesario
     if (step === 'reports') {
         inicializarReportes();
@@ -204,18 +182,20 @@ function resetWizard() {
         el.classList.remove('active');
         if (index === 0) el.classList.add('active');
     });
+    
+    document.getElementById('progress').style.width = '0%';
 }
 
-function nextStep(step) {
-    if (validateCurrentStep(step - 1)) {
-        updateWizardProgress(step);
-        showWizardStep(step);
+function nextStep(currentStep) {
+    if (validateCurrentStep(currentStep)) {
+        updateWizardProgress(currentStep + 1);
+        showWizardStep(currentStep + 1);
     }
 }
 
-function prevStep(step) {
-    updateWizardProgress(step - 1);
-    showWizardStep(step - 1);
+function prevStep(currentStep) {
+    updateWizardProgress(currentStep - 1);
+    showWizardStep(currentStep - 1);
 }
 
 function updateWizardProgress(step) {
@@ -234,8 +214,11 @@ function showWizardStep(step) {
     document.querySelectorAll('.wizard-step').forEach(el => {
         el.classList.remove('active');
     });
-    document.getElementById(`wizard-step-${step}`).classList.add('active');
-    window.scrollTo(0, 0);
+    const stepEl = document.getElementById(`wizard-step-${step}`);
+    if (stepEl) {
+        stepEl.classList.add('active');
+        window.scrollTo(0, 0);
+    }
 }
 
 function validateCurrentStep(step) {
@@ -932,12 +915,12 @@ function exportarTodosPDF() {
 // =============================================
 function setupEventListeners() {
     // Navegación del wizard
-    document.getElementById('next-step-1').addEventListener('click', () => nextStep(2));
-    document.getElementById('prev-step-2').addEventListener('click', () => prevStep(1));
-    document.getElementById('next-step-2').addEventListener('click', () => nextStep(3));
-    document.getElementById('prev-step-3').addEventListener('click', () => prevStep(2));
-    document.getElementById('next-step-3').addEventListener('click', () => nextStep(4));
-    document.getElementById('prev-step-4').addEventListener('click', () => prevStep(3));
+    document.getElementById('next-step-1').addEventListener('click', () => nextStep(1));
+    document.getElementById('prev-step-2').addEventListener('click', () => prevStep(2));
+    document.getElementById('next-step-2').addEventListener('click', () => nextStep(2));
+    document.getElementById('prev-step-3').addEventListener('click', () => prevStep(3));
+    document.getElementById('next-step-3').addEventListener('click', () => nextStep(3));
+    document.getElementById('prev-step-4').addEventListener('click', () => prevStep(4));
     document.getElementById('calculate-results').addEventListener('click', calcularResultados);
     
     // Acciones de resultados
@@ -1010,7 +993,7 @@ function setupEventListeners() {
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     resetearFormulario();
-    showStep('evaluation'); // Forzar mostrar evaluación al inicio
+    showStep('evaluation');
     
     const logo = document.querySelector('.logo');
     if (logo) logo.onerror = () => logo.style.display = 'none';
