@@ -163,10 +163,12 @@ function resetearFormulario() {
 // FUNCIONES DE NAVEGACIÓN
 // =============================================
 function showStep(step) {
+    // Ocultar todos los pasos
     document.querySelectorAll('.step-content').forEach(el => {
         el.classList.remove('active');
     });
     
+    // Mostrar el paso seleccionado
     const stepEl = document.getElementById(`step-${step}`);
     if (stepEl) {
         stepEl.classList.add('active');
@@ -175,15 +177,18 @@ function showStep(step) {
             step === 'history' ? 'Historial' : 'Reportes';
     }
     
+    // Actualizar menú activo
     document.querySelectorAll('.menu li').forEach(el => el.classList.remove('active'));
     const menuItem = document.querySelector(`.menu li[data-step="${step}"]`);
     if (menuItem) menuItem.classList.add('active');
     
+    // Resetear progreso si es nueva evaluación
     if (step === 'evaluation') {
         document.getElementById('progress').style.width = '0%';
         resetWizard();
     }
     
+    // Inicializar reportes si es necesario
     if (step === 'reports') {
         inicializarReportes();
     }
@@ -219,7 +224,7 @@ function updateWizardProgress(step) {
     
     document.querySelectorAll('.wizard-progress .step').forEach(el => {
         el.classList.remove('active');
-        if (parseInt(el.getAttribute('data-step')) <= step) {
+        if (parseInt(el.getAttribute('data-step')) {
             el.classList.add('active');
         }
     });
@@ -926,6 +931,7 @@ function exportarTodosPDF() {
 // INICIALIZACIÓN
 // =============================================
 function setupEventListeners() {
+    // Navegación del wizard
     document.getElementById('next-step-1').addEventListener('click', () => nextStep(2));
     document.getElementById('prev-step-2').addEventListener('click', () => prevStep(2));
     document.getElementById('next-step-2').addEventListener('click', () => nextStep(3));
@@ -934,12 +940,15 @@ function setupEventListeners() {
     document.getElementById('prev-step-4').addEventListener('click', () => prevStep(4));
     document.getElementById('calculate-results').addEventListener('click', calcularResultados);
     
+    // Acciones de resultados
     document.getElementById('save-evaluation').addEventListener('click', guardarEvaluacion);
     document.getElementById('export-pdf').addEventListener('click', () => generarPDF());
     document.getElementById('new-evaluation').addEventListener('click', resetearFormulario);
     
+    // Búsqueda
     document.getElementById('search-button').addEventListener('click', buscarEvaluaciones);
     
+    // Menú principal
     document.querySelectorAll('.menu li').forEach(item => {
         item.addEventListener('click', function() {
             const step = this.getAttribute('data-step');
@@ -951,6 +960,7 @@ function setupEventListeners() {
         });
     });
     
+    // Actualización de descripciones al cambiar selecciones
     document.getElementById('gerencial').addEventListener('change', function() {
         document.getElementById('gerencial-desc').textContent = knowHowData.competencia_gerencial[this.value] || '';
     });
@@ -979,6 +989,7 @@ function setupEventListeners() {
         document.getElementById('impacto-desc').textContent = responsabilidadData.impacto[this.value] || '';
     });
     
+    // Contador de caracteres
     document.getElementById('descripcion').addEventListener('input', function() {
         const counter = document.getElementById('descripcion-counter');
         counter.textContent = this.value.length;
@@ -995,13 +1006,14 @@ function setupEventListeners() {
     });
 }
 
+// Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-    resetearFormulario(); // Limpia todo y muestra Nueva Evaluación
+    resetearFormulario();
+    showStep('evaluation'); // Forzar mostrar evaluación al inicio
     
     const logo = document.querySelector('.logo');
     if (logo) logo.onerror = () => logo.style.display = 'none';
     
-    // Opcional: Cargar el historial en segundo plano (sin mostrarlo)
-    cargarHistorial(); 
+    cargarHistorial();
 });
