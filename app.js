@@ -117,16 +117,56 @@ const evaluationModel = {
 };
 
 // =============================================
-// FUNCIONES DE NAVEGACIÓN MEJORADAS
+// FUNCIÓN PARA RESETEAR EL FORMULARIO
 // =============================================
+function resetearFormulario() {
+    currentEvaluation = null;
+    
+    // Resetear todos los campos del formulario
+    document.getElementById('nombrePuesto').value = '';
+    document.getElementById('departamento').value = '';
+    document.getElementById('nivelReporte').value = '';
+    document.getElementById('descripcion').value = '';
+    document.getElementById('responsabilidades').value = '';
+    document.getElementById('funciones').value = '';
+    document.getElementById('competencia').value = '';
+    
+    // Resetear campos de Know-How
+    document.getElementById('gerencial').value = '';
+    document.getElementById('tecnica').value = '';
+    document.getElementById('comunicacion').value = '';
+    document.getElementById('gerencial-desc').textContent = '';
+    document.getElementById('tecnica-desc').textContent = '';
+    document.getElementById('comunicacion-desc').textContent = '';
+    
+    // Resetear campos de Solución de Problemas
+    document.getElementById('complejidad').value = '';
+    document.getElementById('marco').value = '';
+    document.getElementById('complejidad-desc').textContent = '';
+    document.getElementById('marco-desc').textContent = '';
+    
+    // Resetear campos de Responsabilidad
+    document.getElementById('libertad').value = '';
+    document.getElementById('impacto').value = '';
+    document.getElementById('libertad-desc').textContent = '';
+    document.getElementById('impacto-desc').textContent = '';
+    
+    // Resetear contador de caracteres
+    document.getElementById('descripcion-counter').textContent = '0';
+    
+    // Mostrar el primer paso
+    showStep('evaluation');
+    resetWizard();
+}
 
+// =============================================
+// FUNCIONES DE NAVEGACIÓN
+// =============================================
 function showStep(step) {
-    // Ocultar todos los pasos
     document.querySelectorAll('.step-content').forEach(el => {
         el.classList.remove('active');
     });
     
-    // Mostrar paso actual
     const stepEl = document.getElementById(`step-${step}`);
     if (stepEl) {
         stepEl.classList.add('active');
@@ -135,18 +175,15 @@ function showStep(step) {
             step === 'history' ? 'Historial' : 'Reportes';
     }
     
-    // Actualizar menú lateral
     document.querySelectorAll('.menu li').forEach(el => el.classList.remove('active'));
     const menuItem = document.querySelector(`.menu li[data-step="${step}"]`);
     if (menuItem) menuItem.classList.add('active');
     
-    // Actualizar barra de progreso
     if (step === 'evaluation') {
         document.getElementById('progress').style.width = '0%';
         resetWizard();
     }
     
-    // Inicializar reportes si es necesario
     if (step === 'reports') {
         inicializarReportes();
     }
@@ -214,7 +251,6 @@ function validateCurrentStep(step) {
 // =============================================
 // VALIDACIONES
 // =============================================
-
 function validateStep1() {
     const required = ['nombrePuesto', 'departamento', 'nivelReporte', 'descripcion', 'responsabilidades'];
     let isValid = true;
@@ -229,7 +265,6 @@ function validateStep1() {
         }
     });
     
-    // Validar longitud de descripción
     const descripcion = document.getElementById('descripcion');
     if (descripcion.value.length > 500) {
         descripcion.style.borderColor = 'red';
@@ -318,7 +353,6 @@ function validateStep4() {
 // =============================================
 // CÁLCULOS HAY
 // =============================================
-
 function calcularKnowHow(gerencial, tecnica, comunicacion) {
     const puntaje = knowHowData.puntajes[tecnica][comunicacion];
     return {
@@ -366,11 +400,9 @@ function determinarNivelHAY(total) {
 // =============================================
 // FUNCIÓN PRINCIPAL DE CÁLCULO
 // =============================================
-
 function calcularResultados() {
     if (!validateStep4()) return;
     
-    // Obtener valores del formulario
     const nombrePuesto = document.getElementById('nombrePuesto').value;
     const departamento = document.getElementById('departamento').value;
     const nivelReporte = document.getElementById('nivelReporte').value;
@@ -389,19 +421,15 @@ function calcularResultados() {
     const libertad = document.getElementById('libertad').value;
     const impacto = document.getElementById('impacto').value;
     
-    // Calcular dimensiones
     const knowHow = calcularKnowHow(gerencial, tecnica, comunicacion);
     const solucion = calcularSolucionProblemas(complejidad, marco);
     const responsabilidad = calcularResponsabilidad(libertad, impacto);
     
-    // Calcular perfil
     solucion.perfil = determinarPerfilCorto(solucion.puntaje, knowHow.puntaje);
     
-    // Calcular total y nivel HAY
     const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
     const hayScore = determinarNivelHAY(total);
     
-    // Guardar evaluación actual
     currentEvaluation = {
         id: Date.now(),
         nombre: nombrePuesto,
@@ -419,7 +447,6 @@ function calcularResultados() {
         fecha: new Date().toISOString()
     };
     
-    // Mostrar resultados
     mostrarResultados();
     nextStep(5);
 }
@@ -445,7 +472,6 @@ function mostrarResultados() {
 // =============================================
 // GESTIÓN DE EVALUACIONES
 // =============================================
-
 function guardarEvaluacion() {
     if (!currentEvaluation) {
         alert('No hay evaluación para guardar');
@@ -454,7 +480,6 @@ function guardarEvaluacion() {
     
     let evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
     
-    // Actualizar si ya existe
     const index = evaluaciones.findIndex(e => e.id === currentEvaluation.id);
     if (index !== -1) {
         evaluaciones[index] = currentEvaluation;
@@ -502,7 +527,6 @@ function editarEvaluacion(id) {
     if (eval) {
         currentEvaluation = eval;
         
-        // Llenar formularios
         document.getElementById('nombrePuesto').value = eval.nombre;
         document.getElementById('departamento').value = eval.departamento;
         document.getElementById('nivelReporte').value = eval.nivelReporte;
@@ -511,7 +535,6 @@ function editarEvaluacion(id) {
         document.getElementById('funciones').value = eval.funciones;
         document.getElementById('competencia').value = eval.competencias;
         
-        // Mostrar primer paso
         showStep('evaluation');
     }
 }
@@ -560,7 +583,6 @@ function buscarEvaluaciones() {
 // =============================================
 // GENERACIÓN DE PDF
 // =============================================
-
 function generarPDF(id = null) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -574,7 +596,6 @@ function generarPDF(id = null) {
         return;
     }
     
-    // Configuración básica del PDF
     doc.setFontSize(20);
     doc.text('Evaluación HAY - Metodología de Puestos', 105, 20, { align: 'center' });
     doc.setFontSize(16);
@@ -582,14 +603,12 @@ function generarPDF(id = null) {
     doc.text(`Departamento: ${evaluationData.departamento}`, 20, 45);
     doc.text(`Nivel de Reporte: ${evaluationData.nivelReporte}`, 20, 55);
     
-    // Detalles de la evaluación
     doc.setFontSize(12);
     doc.text(`Descripción: ${evaluationData.descripcion}`, 20, 70);
     doc.text(`Responsabilidades: ${evaluationData.responsabilidades}`, 20, 90);
     doc.text(`Funciones: ${evaluationData.funciones}`, 20, 110);
     doc.text(`Competencias: ${evaluationData.competencias}`, 20, 130);
     
-    // Resultados
     doc.setFontSize(14);
     doc.text('Resultados de la Evaluación:', 20, 150);
     
@@ -606,13 +625,11 @@ function generarPDF(id = null) {
     doc.text(`- ${evaluationData.responsabilidad.libertad}`, 25, 255);
     doc.text(`- Impacto: ${evaluationData.responsabilidad.impacto}`, 25, 265);
     
-    // Resumen final
     doc.setFontSize(16);
     doc.text(`Puntaje Total: ${evaluationData.total}`, 20, 285);
     doc.text(`Nivel HAY: ${evaluationData.hayScore}`, 20, 300);
     doc.text(`Perfil: ${evaluationData.solucion.perfil.includes('P') ? 'Estratégico' : 'Técnico'}`, 20, 315);
     
-    // Fecha
     doc.setFontSize(10);
     doc.text(`Evaluación generada el: ${new Date(evaluationData.fecha).toLocaleDateString()}`, 20, 330);
     
@@ -622,7 +639,6 @@ function generarPDF(id = null) {
 // =============================================
 // REPORTES Y ESTADÍSTICAS
 // =============================================
-
 function inicializarReportes() {
     const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
     
@@ -633,19 +649,15 @@ function inicializarReportes() {
         return;
     }
     
-    // Gráfico de distribución por niveles
     const nivelCtx = document.getElementById('level-chart').getContext('2d');
     generarGraficoNiveles(nivelCtx, evaluaciones);
     
-    // Gráfico de tendencia mensual
     const tendenciaCtx = document.getElementById('trend-chart').getContext('2d');
     generarGraficoTendencia(tendenciaCtx, evaluaciones);
     
-    // Gráfico de perfiles
     const perfilCtx = document.getElementById('profile-chart').getContext('2d');
     generarGraficoPerfiles(perfilCtx, evaluaciones);
     
-    // Configurar botones de exportación
     document.getElementById('export-excel').addEventListener('click', exportarExcel);
     document.getElementById('export-all-pdf').addEventListener('click', exportarTodosPDF);
 }
@@ -735,7 +747,6 @@ function generarGraficoNiveles(ctx, evaluaciones) {
 }
 
 function generarGraficoTendencia(ctx, evaluaciones) {
-    // Agrupar por mes
     const meses = {};
     const ahora = new Date();
     const ultimos6Meses = [];
@@ -858,14 +869,12 @@ function exportarExcel() {
         return;
     }
     
-    // Crear contenido CSV
     let csvContent = "Nombre,Puesto,Departamento,Nivel,Perfil,Puntaje,Fecha\n";
     
     evaluaciones.forEach(eval => {
         csvContent += `"${eval.nombre}","${eval.descripcion.substring(0, 50)}...","${eval.departamento}","${eval.hayScore}","${eval.solucion.perfil}","${eval.total}","${new Date(eval.fecha).toLocaleDateString()}"\n`;
     });
     
-    // Crear enlace de descarga
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -887,13 +896,11 @@ function exportarTodosPDF() {
         return;
     }
     
-    // Configuración básica del PDF
     doc.setFontSize(20);
     doc.text('Reporte Completo de Evaluaciones HAY', 105, 20, { align: 'center' });
     doc.setFontSize(12);
     doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
     
-    // Tabla de resumen
     doc.autoTable({
         startY: 40,
         head: [['Nombre', 'Departamento', 'Nivel', 'Perfil', 'Puntaje', 'Fecha']],
@@ -907,7 +914,7 @@ function exportarTodosPDF() {
         ]),
         theme: 'grid',
         headStyles: {
-            fillColor: [42, 75, 215],  // Azul oscuro
+            fillColor: [42, 75, 215],
             textColor: 255
         }
     });
@@ -918,9 +925,7 @@ function exportarTodosPDF() {
 // =============================================
 // INICIALIZACIÓN
 // =============================================
-
 function setupEventListeners() {
-    // Configurar botones de navegación
     document.getElementById('next-step-1').addEventListener('click', () => nextStep(2));
     document.getElementById('prev-step-2').addEventListener('click', () => prevStep(2));
     document.getElementById('next-step-2').addEventListener('click', () => nextStep(3));
@@ -929,41 +934,23 @@ function setupEventListeners() {
     document.getElementById('prev-step-4').addEventListener('click', () => prevStep(4));
     document.getElementById('calculate-results').addEventListener('click', calcularResultados);
     
-    // Botones de resultados
     document.getElementById('save-evaluation').addEventListener('click', guardarEvaluacion);
     document.getElementById('export-pdf').addEventListener('click', () => generarPDF());
-    document.getElementById('new-evaluation').addEventListener('click', () => {
-        currentEvaluation = null;
-        document.getElementById('nombrePuesto').value = '';
-        document.getElementById('departamento').value = '';
-        document.getElementById('nivelReporte').value = '';
-        document.getElementById('descripcion').value = '';
-        document.getElementById('responsabilidades').value = '';
-        document.getElementById('funciones').value = '';
-        document.getElementById('competencia').value = '';
-        document.getElementById('gerencial').value = '';
-        document.getElementById('tecnica').value = '';
-        document.getElementById('comunicacion').value = '';
-        document.getElementById('complejidad').value = '';
-        document.getElementById('marco').value = '';
-        document.getElementById('libertad').value = '';
-        document.getElementById('impacto').value = '';
-        showStep('evaluation');
-        resetWizard();
-    });
+    document.getElementById('new-evaluation').addEventListener('click', resetearFormulario);
     
-    // Botón de búsqueda
     document.getElementById('search-button').addEventListener('click', buscarEvaluaciones);
     
-    // Menú lateral
     document.querySelectorAll('.menu li').forEach(item => {
         item.addEventListener('click', function() {
             const step = this.getAttribute('data-step');
-            showStep(step);
+            if (step === 'evaluation' && !currentEvaluation) {
+                resetearFormulario();
+            } else {
+                showStep(step);
+            }
         });
     });
     
-    // Event listeners para descripciones dinámicas
     document.getElementById('gerencial').addEventListener('change', function() {
         document.getElementById('gerencial-desc').textContent = knowHowData.competencia_gerencial[this.value] || '';
     });
@@ -992,7 +979,6 @@ function setupEventListeners() {
         document.getElementById('impacto-desc').textContent = responsabilidadData.impacto[this.value] || '';
     });
     
-    // Contador de caracteres para descripción
     document.getElementById('descripcion').addEventListener('input', function() {
         const counter = document.getElementById('descripcion-counter');
         counter.textContent = this.value.length;
@@ -1013,10 +999,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     showStep('evaluation');
     
-    // Manejar logo faltante
     const logo = document.querySelector('.logo');
     if (logo) logo.onerror = () => logo.style.display = 'none';
     
-    // Cargar historial si existe
     cargarHistorial();
 });
