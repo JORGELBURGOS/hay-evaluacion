@@ -224,7 +224,7 @@ function updateWizardProgress(step) {
     
     document.querySelectorAll('.wizard-progress .step').forEach(el => {
         el.classList.remove('active');
-        if (parseInt(el.getAttribute('data-step')) {
+        if (parseInt(el.getAttribute('data-step')) <= step) {
             el.classList.add('active');
         }
     });
@@ -933,11 +933,11 @@ function exportarTodosPDF() {
 function setupEventListeners() {
     // Navegación del wizard
     document.getElementById('next-step-1').addEventListener('click', () => nextStep(2));
-    document.getElementById('prev-step-2').addEventListener('click', () => prevStep(2));
+    document.getElementById('prev-step-2').addEventListener('click', () => prevStep(1));
     document.getElementById('next-step-2').addEventListener('click', () => nextStep(3));
-    document.getElementById('prev-step-3').addEventListener('click', () => prevStep(3));
+    document.getElementById('prev-step-3').addEventListener('click', () => prevStep(2));
     document.getElementById('next-step-3').addEventListener('click', () => nextStep(4));
-    document.getElementById('prev-step-4').addEventListener('click', () => prevStep(4));
+    document.getElementById('prev-step-4').addEventListener('click', () => prevStep(3));
     document.getElementById('calculate-results').addEventListener('click', calcularResultados);
     
     // Acciones de resultados
