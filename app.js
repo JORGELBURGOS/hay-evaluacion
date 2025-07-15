@@ -997,10 +997,11 @@ function setupEventListeners() {
 
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-    showStep('evaluation');
+    resetearFormulario(); // Limpia todo y muestra Nueva Evaluación
     
     const logo = document.querySelector('.logo');
     if (logo) logo.onerror = () => logo.style.display = 'none';
     
-    cargarHistorial();
+    // Opcional: Cargar el historial en segundo plano (sin mostrarlo)
+    cargarHistorial(); 
 });
