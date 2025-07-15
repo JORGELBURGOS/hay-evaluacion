@@ -102,20 +102,43 @@
                                     </div>
                                     
                                     <div class="form-group">
+                                        <label for="departamento">Departamento/Área*</label>
+                                        <input type="text" id="departamento" required placeholder="Ej: Marketing">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="nivelReporte">Nivel de Reporte*</label>
+                                        <select id="nivelReporte" required>
+                                            <option value="">Seleccione nivel</option>
+                                            <option value="altaDireccion">Alta Dirección</option>
+                                            <option value="gerencia">Gerencia</option>
+                                            <option value="supervision">Supervisión</option>
+                                            <option value="operativo">Operativo</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
                                         <label for="descripcion">Descripción General*</label>
-                                        <textarea id="descripcion" rows="4" required placeholder="Describa el propósito principal del puesto..."></textarea>
+                                        <div class="input-hint">Máximo 500 caracteres (<span id="descripcion-counter">0</span>/500)</div>
+                                        <textarea id="descripcion" rows="4" maxlength="500" required placeholder="Describa el propósito principal del puesto..."></textarea>
                                     </div>
                                     
                                     <div class="form-group">
                                         <label for="responsabilidades">Responsabilidades Clave*</label>
-                                        <div class="input-hint">Separe cada responsabilidad con punto y coma (;)</div>
+                                        <div class="input-hint">Separe cada responsabilidad con punto y coma (;) - Máximo 10 items</div>
                                         <textarea id="responsabilidades" rows="4" required placeholder="1. Responsabilidad; 2. Otra responsabilidad..."></textarea>
                                     </div>
                                     
                                     <div class="form-group">
                                         <label for="funciones">Funciones Específicas</label>
-                                        <div class="input-hint">Opcional - Separe cada función con punto y coma (;)</div>
+                                        <div class="input-hint">Opcional - Separe cada función con punto y coma (;) - Máximo 15 items</div>
                                         <textarea id="funciones" rows="4" placeholder="1. Función diaria; 2. Otra función..."></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="competencia">Competencias Requeridas</label>
+                                        <div class="input-hint">Separe cada competencia con punto y coma (;)</div>
+                                        <textarea id="competencia" rows="4" placeholder="1. Liderazgo; 2. Trabajo en equipo..."></textarea>
                                     </div>
                                 </div>
                                 
@@ -424,6 +447,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="app.js"></script> <!-- Cambiado a ruta directa en raíz -->
+    <script src="app.js"></script>
 </body>
 </html>

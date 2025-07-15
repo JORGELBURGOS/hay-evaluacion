@@ -102,9 +102,12 @@ let currentEvaluation = null;
 const evaluationModel = {
     id: null,
     nombre: "",
+    departamento: "",
+    nivelReporte: "",
     descripcion: "",
     responsabilidades: "",
     funciones: "",
+    competencias: "",
     knowHow: {},
     solucion: {},
     responsabilidad: {},
@@ -127,6 +130,9 @@ function showStep(step) {
     const stepEl = document.getElementById(`step-${step}`);
     if (stepEl) {
         stepEl.classList.add('active');
+        document.getElementById('current-step-name').textContent = 
+            step === 'evaluation' ? 'Nueva Evaluación' : 
+            step === 'history' ? 'Historial' : 'Reportes';
     }
     
     // Actualizar menú lateral
@@ -138,6 +144,11 @@ function showStep(step) {
     if (step === 'evaluation') {
         document.getElementById('progress').style.width = '0%';
         resetWizard();
+    }
+    
+    // Inicializar reportes si es necesario
+    if (step === 'reports') {
+        inicializarReportes();
     }
 }
 
@@ -205,7 +216,7 @@ function validateCurrentStep(step) {
 // =============================================
 
 function validateStep1() {
-    const required = ['nombrePuesto', 'descripcion', 'responsabilidades'];
+    const required = ['nombrePuesto', 'departamento', 'nivelReporte', 'descripcion', 'responsabilidades'];
     let isValid = true;
     
     required.forEach(id => {
@@ -217,6 +228,14 @@ function validateStep1() {
             field.style.borderColor = '#ddd';
         }
     });
+    
+    // Validar longitud de descripción
+    const descripcion = document.getElementById('descripcion');
+    if (descripcion.value.length > 500) {
+        descripcion.style.borderColor = 'red';
+        isValid = false;
+        alert('La descripción no puede exceder los 500 caracteres');
+    }
     
     if (!isValid) {
         alert('Complete los campos obligatorios (*)');
@@ -353,9 +372,12 @@ function calcularResultados() {
     
     // Obtener valores del formulario
     const nombrePuesto = document.getElementById('nombrePuesto').value;
+    const departamento = document.getElementById('departamento').value;
+    const nivelReporte = document.getElementById('nivelReporte').value;
     const descripcion = document.getElementById('descripcion').value;
     const responsabilidades = document.getElementById('responsabilidades').value;
     const funciones = document.getElementById('funciones').value;
+    const competencias = document.getElementById('competencia').value;
     
     const gerencial = document.getElementById('gerencial').value;
     const tecnica = document.getElementById('tecnica').value;
@@ -383,9 +405,12 @@ function calcularResultados() {
     currentEvaluation = {
         id: Date.now(),
         nombre: nombrePuesto,
+        departamento: departamento,
+        nivelReporte: nivelReporte,
         descripcion: descripcion,
         responsabilidades: responsabilidades,
         funciones: funciones,
+        competencias: competencias,
         knowHow: knowHow,
         solucion: solucion,
         responsabilidad: responsabilidad,
@@ -450,6 +475,7 @@ function cargarHistorial() {
         <div class="eval-card">
             <h3>${eval.nombre}</h3>
             <small>${new Date(eval.fecha).toLocaleDateString('es-AR')}</small>
+            <p><strong>Departamento:</strong> ${eval.departamento}</p>
             <p><strong>Nivel HAY:</strong> ${eval.hayScore.split(' -')[0]}</p>
             <p>${eval.descripcion.substring(0, 80)}...</p>
             <div class="eval-actions">
@@ -478,9 +504,12 @@ function editarEvaluacion(id) {
         
         // Llenar formularios
         document.getElementById('nombrePuesto').value = eval.nombre;
+        document.getElementById('departamento').value = eval.departamento;
+        document.getElementById('nivelReporte').value = eval.nivelReporte;
         document.getElementById('descripcion').value = eval.descripcion;
         document.getElementById('responsabilidades').value = eval.responsabilidades;
         document.getElementById('funciones').value = eval.funciones;
+        document.getElementById('competencia').value = eval.competencias;
         
         // Mostrar primer paso
         showStep('evaluation');
@@ -501,7 +530,8 @@ function buscarEvaluaciones() {
     const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
     
     const filtered = term ? 
-        evaluaciones.filter(e => e.nombre.toLowerCase().includes(term)) : 
+        evaluaciones.filter(e => e.nombre.toLowerCase().includes(term) || 
+                               e.departamento.toLowerCase().includes(term)) : 
         evaluaciones;
     
     const list = document.getElementById('evaluations-list');
@@ -509,6 +539,8 @@ function buscarEvaluaciones() {
         <div class="eval-card">
             <h3>${eval.nombre}</h3>
             <small>${new Date(eval.fecha).toLocaleDateString()}</small>
+            <p><strong>Departamento:</strong> ${eval.departamento}</p>
+            <p><strong>Nivel HAY:</strong> ${eval.hayScore.split(' -')[0]}</p>
             <p>${eval.descripcion.substring(0, 80)}...</p>
             <div class="eval-actions">
                 <button onclick="editarEvaluacion(${eval.id})">
@@ -547,41 +579,340 @@ function generarPDF(id = null) {
     doc.text('Evaluación HAY - Metodología de Puestos', 105, 20, { align: 'center' });
     doc.setFontSize(16);
     doc.text(`Puesto: ${evaluationData.nombre}`, 20, 35);
+    doc.text(`Departamento: ${evaluationData.departamento}`, 20, 45);
+    doc.text(`Nivel de Reporte: ${evaluationData.nivelReporte}`, 20, 55);
     
     // Detalles de la evaluación
     doc.setFontSize(12);
-    doc.text(`Descripción: ${evaluationData.descripcion}`, 20, 50);
-    doc.text(`Responsabilidades: ${evaluationData.responsabilidades}`, 20, 65);
-    doc.text(`Funciones: ${evaluationData.funciones}`, 20, 80);
+    doc.text(`Descripción: ${evaluationData.descripcion}`, 20, 70);
+    doc.text(`Responsabilidades: ${evaluationData.responsabilidades}`, 20, 90);
+    doc.text(`Funciones: ${evaluationData.funciones}`, 20, 110);
+    doc.text(`Competencias: ${evaluationData.competencias}`, 20, 130);
     
     // Resultados
     doc.setFontSize(14);
-    doc.text('Resultados de la Evaluación:', 20, 100);
+    doc.text('Resultados de la Evaluación:', 20, 150);
     
-    doc.text(`Know-How: ${evaluationData.knowHow.puntaje} pts`, 20, 115);
-    doc.text(`- ${evaluationData.knowHow.gerencial}`, 25, 125);
-    doc.text(`- ${evaluationData.knowHow.tecnica}`, 25, 135);
-    doc.text(`- ${evaluationData.knowHow.comunicacion}`, 25, 145);
+    doc.text(`Know-How: ${evaluationData.knowHow.puntaje} pts`, 20, 165);
+    doc.text(`- ${evaluationData.knowHow.gerencial}`, 25, 175);
+    doc.text(`- ${evaluationData.knowHow.tecnica}`, 25, 185);
+    doc.text(`- ${evaluationData.knowHow.comunicacion}`, 25, 195);
     
-    doc.text(`Solución de Problemas: ${evaluationData.solucion.puntaje} pts`, 20, 160);
-    doc.text(`- ${evaluationData.solucion.complejidad}`, 25, 170);
-    doc.text(`- ${evaluationData.solucion.marco}`, 25, 180);
+    doc.text(`Solución de Problemas: ${evaluationData.solucion.puntaje} pts`, 20, 210);
+    doc.text(`- ${evaluationData.solucion.complejidad}`, 25, 220);
+    doc.text(`- ${evaluationData.solucion.marco}`, 25, 230);
     
-    doc.text(`Responsabilidad: ${evaluationData.responsabilidad.puntaje} pts`, 20, 195);
-    doc.text(`- ${evaluationData.responsabilidad.libertad}`, 25, 205);
-    doc.text(`- Impacto: ${evaluationData.responsabilidad.impacto}`, 25, 215);
+    doc.text(`Responsabilidad: ${evaluationData.responsabilidad.puntaje} pts`, 20, 245);
+    doc.text(`- ${evaluationData.responsabilidad.libertad}`, 25, 255);
+    doc.text(`- Impacto: ${evaluationData.responsabilidad.impacto}`, 25, 265);
     
     // Resumen final
     doc.setFontSize(16);
-    doc.text(`Puntaje Total: ${evaluationData.total}`, 20, 235);
-    doc.text(`Nivel HAY: ${evaluationData.hayScore}`, 20, 250);
-    doc.text(`Perfil: ${evaluationData.solucion.perfil.includes('P') ? 'Estratégico' : 'Técnico'}`, 20, 265);
+    doc.text(`Puntaje Total: ${evaluationData.total}`, 20, 285);
+    doc.text(`Nivel HAY: ${evaluationData.hayScore}`, 20, 300);
+    doc.text(`Perfil: ${evaluationData.solucion.perfil.includes('P') ? 'Estratégico' : 'Técnico'}`, 20, 315);
     
     // Fecha
     doc.setFontSize(10);
-    doc.text(`Evaluación generada el: ${new Date(evaluationData.fecha).toLocaleDateString()}`, 20, 280);
+    doc.text(`Evaluación generada el: ${new Date(evaluationData.fecha).toLocaleDateString()}`, 20, 330);
     
     doc.save(`Evaluacion_HAY_${evaluationData.nombre.replace(/ /g, '_')}.pdf`);
+}
+
+// =============================================
+// REPORTES Y ESTADÍSTICAS
+// =============================================
+
+function inicializarReportes() {
+    const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+    
+    if (evaluaciones.length === 0) {
+        document.getElementById('level-chart').parentElement.innerHTML = '<p class="no-data">No hay datos para mostrar</p>';
+        document.getElementById('trend-chart').parentElement.innerHTML = '<p class="no-data">No hay datos para mostrar</p>';
+        document.getElementById('profile-chart').parentElement.innerHTML = '<p class="no-data">No hay datos para mostrar</p>';
+        return;
+    }
+    
+    // Gráfico de distribución por niveles
+    const nivelCtx = document.getElementById('level-chart').getContext('2d');
+    generarGraficoNiveles(nivelCtx, evaluaciones);
+    
+    // Gráfico de tendencia mensual
+    const tendenciaCtx = document.getElementById('trend-chart').getContext('2d');
+    generarGraficoTendencia(tendenciaCtx, evaluaciones);
+    
+    // Gráfico de perfiles
+    const perfilCtx = document.getElementById('profile-chart').getContext('2d');
+    generarGraficoPerfiles(perfilCtx, evaluaciones);
+    
+    // Configurar botones de exportación
+    document.getElementById('export-excel').addEventListener('click', exportarExcel);
+    document.getElementById('export-all-pdf').addEventListener('click', exportarTodosPDF);
+}
+
+function generarGraficoNiveles(ctx, evaluaciones) {
+    const niveles = {
+        '1-7': 0,
+        '8-10': 0,
+        '11-13': 0,
+        '14-16': 0,
+        '17-19': 0,
+        '20-22': 0,
+        '23-24': 0,
+        '25': 0
+    };
+    
+    evaluaciones.forEach(eval => {
+        const nivel = eval.hayScore.split(' -')[0];
+        
+        if (nivel === '25') {
+            niveles['25']++;
+        } else if (nivel.includes('23-24')) {
+            niveles['23-24']++;
+        } else if (nivel.includes('20-22')) {
+            niveles['20-22']++;
+        } else if (nivel.includes('17-19')) {
+            niveles['17-19']++;
+        } else if (nivel.includes('14-16')) {
+            niveles['14-16']++;
+        } else if (nivel.includes('11-13')) {
+            niveles['11-13']++;
+        } else if (nivel.includes('8-10')) {
+            niveles['8-10']++;
+        } else {
+            niveles['1-7']++;
+        }
+    });
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(niveles).map(key => {
+                if (key === '1-7') return 'Operativos Básicos';
+                if (key === '8-10') return 'Operativos Avanzados';
+                if (key === '11-13') return 'Supervisores';
+                if (key === '14-16') return 'Supervisores Senior';
+                if (key === '17-19') return 'Gerentes Medios';
+                if (key === '20-22') return 'Gerentes Senior';
+                if (key === '23-24') return 'Alta Dirección';
+                return 'Alta Dirección (Estratégico)';
+            }),
+            datasets: [{
+                label: 'Evaluaciones por Nivel',
+                data: Object.values(niveles),
+                backgroundColor: [
+                    '#2a4bd7', '#2340b9', '#2f2bb0', '#4cc9f0', 
+                    '#4895ef', '#560bad', '#7209b7', '#b5179e'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.parsed.y} evaluaciones`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function generarGraficoTendencia(ctx, evaluaciones) {
+    // Agrupar por mes
+    const meses = {};
+    const ahora = new Date();
+    const ultimos6Meses = [];
+    
+    for (let i = 5; i >= 0; i--) {
+        const fecha = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+        const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+        meses[clave] = 0;
+        ultimos6Meses.push(clave);
+    }
+    
+    evaluaciones.forEach(eval => {
+        const fecha = new Date(eval.fecha);
+        const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (meses.hasOwnProperty(clave)) {
+            meses[clave]++;
+        }
+    });
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ultimos6Meses.map(mes => {
+                const [ano, mesNum] = mes.split('-');
+                return `${mesNum}/${ano}`;
+            }),
+            datasets: [{
+                label: 'Evaluaciones por Mes',
+                data: ultimos6Meses.map(mes => meses[mes]),
+                fill: false,
+                borderColor: '#2a4bd7',
+                tension: 0.4,
+                pointBackgroundColor: '#2a4bd7',
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.parsed.y} evaluaciones`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function generarGraficoPerfiles(ctx, evaluaciones) {
+    const perfiles = {
+        'P1': 0, 'P2': 0, 'P3': 0, 'P4': 0,
+        'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0
+    };
+    
+    evaluaciones.forEach(eval => {
+        const perfil = eval.solucion.perfil;
+        if (perfiles.hasOwnProperty(perfil)) {
+            perfiles[perfil]++;
+        }
+    });
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(perfiles).map(p => {
+                return p.startsWith('P') ? `Estratégico ${p.substring(1)}` : `Técnico ${p.substring(1)}`;
+            }),
+            datasets: [{
+                data: Object.values(perfiles),
+                backgroundColor: [
+                    '#2a4bd7', '#2340b9', '#2f2bb0', '#4cc9f0',
+                    '#4895ef', '#560bad', '#7209b7', '#b5179e'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.parsed;
+                            const percentage = Math.round((value / total) * 100);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function exportarExcel() {
+    const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+    
+    if (evaluaciones.length === 0) {
+        alert('No hay evaluaciones para exportar');
+        return;
+    }
+    
+    // Crear contenido CSV
+    let csvContent = "Nombre,Puesto,Departamento,Nivel,Perfil,Puntaje,Fecha\n";
+    
+    evaluaciones.forEach(eval => {
+        csvContent += `"${eval.nombre}","${eval.descripcion.substring(0, 50)}...","${eval.departamento}","${eval.hayScore}","${eval.solucion.perfil}","${eval.total}","${new Date(eval.fecha).toLocaleDateString()}"\n`;
+    });
+    
+    // Crear enlace de descarga
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `evaluaciones_hay_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportarTodosPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+    
+    if (evaluaciones.length === 0) {
+        alert('No hay evaluaciones para exportar');
+        return;
+    }
+    
+    // Configuración básica del PDF
+    doc.setFontSize(20);
+    doc.text('Reporte Completo de Evaluaciones HAY', 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
+    
+    // Tabla de resumen
+    doc.autoTable({
+        startY: 40,
+        head: [['Nombre', 'Departamento', 'Nivel', 'Perfil', 'Puntaje', 'Fecha']],
+        body: evaluaciones.map(eval => [
+            eval.nombre,
+            eval.departamento,
+            eval.hayScore.split(' -')[0],
+            eval.solucion.perfil.includes('P') ? 'Estratégico' : 'Técnico',
+            eval.total.toString(),
+            new Date(eval.fecha).toLocaleDateString()
+        ]),
+        theme: 'grid',
+        headStyles: {
+            fillColor: [42, 75, 215],  // Azul oscuro
+            textColor: 255
+        }
+    });
+    
+    doc.save(`Reporte_HAY_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 // =============================================
@@ -604,9 +935,12 @@ function setupEventListeners() {
     document.getElementById('new-evaluation').addEventListener('click', () => {
         currentEvaluation = null;
         document.getElementById('nombrePuesto').value = '';
+        document.getElementById('departamento').value = '';
+        document.getElementById('nivelReporte').value = '';
         document.getElementById('descripcion').value = '';
         document.getElementById('responsabilidades').value = '';
         document.getElementById('funciones').value = '';
+        document.getElementById('competencia').value = '';
         document.getElementById('gerencial').value = '';
         document.getElementById('tecnica').value = '';
         document.getElementById('comunicacion').value = '';
@@ -656,6 +990,22 @@ function setupEventListeners() {
     
     document.getElementById('impacto').addEventListener('change', function() {
         document.getElementById('impacto-desc').textContent = responsabilidadData.impacto[this.value] || '';
+    });
+    
+    // Contador de caracteres para descripción
+    document.getElementById('descripcion').addEventListener('input', function() {
+        const counter = document.getElementById('descripcion-counter');
+        counter.textContent = this.value.length;
+        
+        if (this.value.length > 450) {
+            counter.classList.add('warning');
+            counter.classList.remove('error');
+        } else if (this.value.length > 490) {
+            counter.classList.remove('warning');
+            counter.classList.add('error');
+        } else {
+            counter.classList.remove('warning', 'error');
+        }
     });
 }
 

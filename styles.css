@@ -1,7 +1,7 @@
 :root {
-    --primary: #4361ee;
-    --primary-dark: #3a56d4;
-    --secondary: #3f37c9;
+    --primary: #2a4bd7;  /* Azul más oscuro */
+    --primary-dark: #2340b9;
+    --secondary: #2f2bb0;
     --accent: #f72585;
     --success: #4cc9f0;
     --warning: #f8961e;
@@ -697,6 +697,67 @@ button {
     gap: 10px;
     width: 100%;
     text-align: left;
+}
+
+/* Estilos adicionales para reportes */
+.no-data {
+    text-align: center;
+    color: var(--gray);
+    font-style: italic;
+    padding: 40px 0;
+}
+
+/* Mejoras para la descripción del puesto */
+.form-group textarea:focus {
+    min-height: 120px;
+}
+
+.char-counter {
+    font-size: 12px;
+    color: var(--gray);
+    text-align: right;
+    margin-top: 5px;
+}
+
+.char-counter.warning {
+    color: var(--warning);
+}
+
+.char-counter.error {
+    color: var(--danger);
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    color: var(--primary);
+    cursor: help;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--dark);
+    color: white;
+    text-align: center;
+    border-radius: var(--border-radius);
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
 
 /* Animaciones */
