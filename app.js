@@ -1,3 +1,4 @@
+let evaluacionEnCurso = false;
 // =============================================
 // DATOS DE EVALUACIÓN HAY (Know-How, Solución, Responsabilidad)
 // =============================================
@@ -117,6 +118,10 @@ const evaluationModel = {
 // FUNCIONES DE NAVEGACIÓN
 // =============================================
 function showStep(step) {
+    if (step === 5 && evaluacionEnCurso) {
+        alert("No podés acceder al historial mientras estás completando una evaluación.");
+        return;
+    }
     // Ocultar todos los pasos
     document.querySelectorAll('.step-content').forEach(el => {
         el.classList.remove('active');
