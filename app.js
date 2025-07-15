@@ -186,16 +186,16 @@ function resetWizard() {
     document.getElementById('progress').style.width = '0%';
 }
 
-function nextStep(currentStep) {
-    if (validateCurrentStep(currentStep)) {
-        updateWizardProgress(currentStep + 1);
-        showWizardStep(currentStep + 1);
+function nextStep(step) {
+    if (validateCurrentStep(step - 1)) {
+        updateWizardProgress(step);
+        showWizardStep(step);
     }
 }
 
-function prevStep(currentStep) {
-    updateWizardProgress(currentStep - 1);
-    showWizardStep(currentStep - 1);
+function prevStep(step) {
+    updateWizardProgress(step - 1);
+    showWizardStep(step - 1);
 }
 
 function updateWizardProgress(step) {
@@ -915,12 +915,12 @@ function exportarTodosPDF() {
 // =============================================
 function setupEventListeners() {
     // Navegación del wizard
-    document.getElementById('next-step-1').addEventListener('click', () => nextStep(1));
-    document.getElementById('prev-step-2').addEventListener('click', () => prevStep(2));
-    document.getElementById('next-step-2').addEventListener('click', () => nextStep(2));
-    document.getElementById('prev-step-3').addEventListener('click', () => prevStep(3));
-    document.getElementById('next-step-3').addEventListener('click', () => nextStep(3));
-    document.getElementById('prev-step-4').addEventListener('click', () => prevStep(4));
+    document.getElementById('next-step-1').addEventListener('click', () => nextStep(2));
+    document.getElementById('prev-step-2').addEventListener('click', () => prevStep(1));
+    document.getElementById('next-step-2').addEventListener('click', () => nextStep(3));
+    document.getElementById('prev-step-3').addEventListener('click', () => prevStep(2));
+    document.getElementById('next-step-3').addEventListener('click', () => nextStep(4));
+    document.getElementById('prev-step-4').addEventListener('click', () => prevStep(3));
     document.getElementById('calculate-results').addEventListener('click', calcularResultados);
     
     // Acciones de resultados
