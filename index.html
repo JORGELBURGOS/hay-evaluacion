@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación HAY - Gestión de Puestos</title>
+    <!-- Fuentes e iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos -->
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: var(--secondary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+        }
+        .menu li {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            border-left: 4px solid transparent;
+        }
+        .menu li:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .menu li.active {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        .menu li i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: #fff;
+        }
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            height: 30px;
+        }
+        .progress {
+            height: 4px;
+            background: var(--primary);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: width 0.3s;
+            z-index: 1;
+        }
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 40px;
+            position: relative;
+            z-index: 2;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .step.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .step-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-prev {
+            background: #f1f1f1;
+            color: #333;
+        }
+        .btn-prev:hover {
+            background: #e1e1e1;
+        }
+        .btn-next, .btn-submit {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-next:hover, .btn-submit:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .btn-save {
+            background: #2ecc71;
+            color: white;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-new {
+            background: #9b59b6;
+            color: white;
+        }
+        .result-card {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 5px solid var(--primary);
+        }
+        .result-details {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+        .result-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .evaluations-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .eval-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .eval-card:hover {
+            transform: translateY(-5px);
+        }
+        .eval-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .eval-actions button {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">HAY Evaluation</div>
+            <ul class="menu">
+                <li class="active" data-step="1"><i class="fas fa-file-alt"></i> Descripción</li>
+                <li data-step="2"><i class="fas fa-brain"></i> Know-How</li>
+                <li data-step="3"><i class="fas fa-puzzle-piece"></i> Solución Problemas</li>
+                <li data-step="4"><i class="fas fa-balance-scale"></i> Responsabilidad</li>
+                <li data-step="5"><i class="fas fa-history"></i> Historial</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Barra de progreso -->
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+                <div class="step active" data-step="1">1</div>
+                <div class="step" data-step="2">2</div>
+                <div class="step" data-step="3">3</div>
+                <div class="step" data-step="4">4</div>
+            </div>
+
+            <!-- Paso 1: Descripción del Puesto -->
+            <div class="step-content active" id="step-1">
+                <h2><i class="fas fa-file-alt"></i> Descripción del Puesto</h2>
+                <div class="form-group">
+                    <label for="nombrePuesto">Nombre del Puesto*</label>
+                    <input type="text" id="nombrePuesto" required placeholder="Ej: Gerente de Marketing Digital">
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción General*</label>
+                    <textarea id="descripcion" rows="4" required placeholder="Describa el propósito principal del puesto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="responsabilidades">Responsabilidades Clave*</label>
+                    <textarea id="responsabilidades" rows="4" required placeholder="Liste las responsabilidades principales (separadas por punto y coma)..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="funciones">Funciones Específicas</label>
+                    <textarea id="funciones" rows="4" placeholder="Detalle las funciones diarias (separadas por punto y coma)..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-next" onclick="nextStep(2)">Siguiente <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Paso 2: Know-How -->
+            <div class="step-content" id="step-2">
+                <h2><i class="fas fa-brain"></i> Know-How</h2>
+                <div class="form-group">
+                    <label for="gerencial">Competencia Gerencial
+                        <span class="tooltip-icon" data-tooltip="Nivel de integración de funciones: I (Específica) a IV (Liderazgo global)"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="gerencial" required>
+                        <option value="">Seleccione competencia gerencial</option>
+                        <option value="I">I - Específica</option>
+                        <option value="II">II - Homogénea</option>
+                        <option value="III">III - Heterogénea</option>
+                        <option value="IV">IV - Amplia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tecnica">Competencia Técnica
+                        <span class="tooltip-icon" data-tooltip="Desde A (Básico) hasta H (Referente científico)"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="tecnica" required>
+                        <option value="">Seleccione competencia técnica</option>
+                        <option value="A">A - Básico</option>
+                        <option value="B">B - Introductorio</option>
+                        <option value="C">C - General</option>
+                        <option value="D">D - Avanzado</option>
+                        <option value="E">E - Especializado</option>
+                        <option value="F">F - Especialización Madura</option>
+                        <option value="G">G - Especialización Amplia</option>
+                        <option value="H">H - Referente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="comunicacion">Comunicación
+                        <span class="tooltip-icon" data-tooltip="1: Información básica. 2: Influencia técnica. 3: Liderazgo y motivación"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="comunicacion" required>
+                        <option value="">Seleccione nivel de comunicación</option>
+                        <option value="1">1 - Comunica</option>
+                        <option value="2">2 - Razonamiento</option>
+                        <option value="3">3 - Cambio de comportamientos</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-prev" onclick="nextStep(1)"><i class="fas fa-arrow-left"></i> Anterior</button>
+                    <button class="btn-next" onclick="nextStep(3)">Siguiente <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Paso 3: Solución de Problemas -->
+            <div class="step-content" id="step-3">
+                <h2><i class="fas fa-puzzle-piece"></i> Solución de Problemas</h2>
+                <div class="form-group">
+                    <label for="complejidad">Complejidad
+                        <span class="tooltip-icon" data-tooltip="1: Tareas repetitivas. 5: Innovación sin precedentes"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="complejidad" required>
+                        <option value="">Seleccione nivel de complejidad</option>
+                        <option value="1">1 - Repetitivo</option>
+                        <option value="2">2 - Con modelos</option>
+                        <option value="3">3 - Variable</option>
+                        <option value="4">4 - Adaptación</option>
+                        <option value="5">5 - Sin precedentes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="marco">Marco de Referencia
+                        <span class="tooltip-icon" data-tooltip="A: Supervisión estricta. H: Autonomía estratégica"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="marco" required>
+                        <option value="">Seleccione marco de referencia</option>
+                        <option value="A">A - Rutina Estricta</option>
+                        <option value="B">B - Rutina</option>
+                        <option value="C">C - Semi-Rutina</option>
+                        <option value="D">D - Estandarizado</option>
+                        <option value="E">E - Definición Clara</option>
+                        <option value="F">F - Definición Amplia</option>
+                        <option value="G">G - Definición Genérica</option>
+                        <option value="H">H - Abstracto</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-prev" onclick="nextStep(2)"><i class="fas fa-arrow-left"></i> Anterior</button>
+                    <button class="btn-next" onclick="nextStep(4)">Siguiente <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Paso 4: Responsabilidad -->
+            <div class="step-content" id="step-4">
+                <h2><i class="fas fa-balance-scale"></i> Responsabilidad</h2>
+                <div class="form-group">
+                    <label for="libertad">Libertad para Actuar
+                        <span class="tooltip-icon" data-tooltip="A: Control total. H: Guía estratégica sin supervisión"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="libertad" required>
+                        <option value="">Seleccione nivel de libertad</option>
+                        <option value="A">A - Control Estricto</option>
+                        <option value="B">B - Control</option>
+                        <option value="C">C - Estandarizado</option>
+                        <option value="D">D - Regulación General</option>
+                        <option value="E">E - Dirección</option>
+                        <option value="F">F - Dirección General</option>
+                        <option value="G">G - Guía</option>
+                        <option value="H">H - Guía Estratégica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="impacto">Impacto
+                        <span class="tooltip-icon" data-tooltip="N: No cuantificable. 4: Impacto global en la organización"><i class="fas fa-info-circle"></i></span>
+                    </label>
+                    <select id="impacto" required>
+                        <option value="">Seleccione nivel de impacto</option>
+                        <option value="N">N - No cuantificada</option>
+                        <option value="1">1 - Muy pequeño</option>
+                        <option value="2">2 - Pequeño</option>
+                        <option value="3">3 - Medio</option>
+                        <option value="4">4 - Grande</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-prev" onclick="nextStep(3)"><i class="fas fa-arrow-left"></i> Anterior</button>
+                    <button class="btn-submit" onclick="calcularResultados()"><i class="fas fa-calculator"></i> Calcular Evaluación</button>
+                </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="step-content" id="step-results">
+                <h2><i class="fas fa-chart-bar"></i> Resultados</h2>
+                <div class="result-card">
+                    <h3>Puesto: <span id="result-nombre"></span></h3>
+                    <p><strong>Puntaje Total:</strong> <span id="result-total"></span></p>
+                    <p><strong>Nivel HAY:</strong> <span id="result-hay"></span></p>
+                    
+                    <div class="result-details">
+                        <h4>Detalles por Dimensión</h4>
+                        <p><strong>Know-How:</strong> <span id="result-knowhow"></span></p>
+                        <p><strong>Solución de Problemas:</strong> <span id="result-solucion"></span></p>
+                        <p><strong>Responsabilidad:</strong> <span id="result-responsabilidad"></span></p>
+                        <p><strong>Perfil:</strong> <span id="result-perfil"></span></p>
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="btn-save" onclick="guardarEvaluacion()"><i class="fas fa-save"></i> Guardar Evaluación</button>
+                        <button class="btn-pdf" onclick="generarPDF()"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+                        <button class="btn-new" onclick="nuevaEvaluacion()"><i class="fas fa-plus"></i> Nueva Evaluación</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 5: Historial -->
+            <div class="step-content" id="step-5">
+                <h2><i class="fas fa-history"></i> Historial de Evaluaciones</h2>
+                <div class="search-box">
+                    <input type="text" id="search-eval" placeholder="Buscar por nombre...">
+                    <button onclick="buscarEvaluaciones()"><i class="fas fa-search"></i> Buscar</button>
+                </div>
+                <div class="evaluations-list" id="evaluations-list">
+                    <!-- Las evaluaciones se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        // =============================================
+        // DATOS DE EVALUACIÓN HAY (Know-How, Solución, Responsabilidad)
+        // =============================================
+        const knowHowData = {
+            "competencia_gerencial": {
+                "I": "Específica: Ejecución de actividades específicas con interacción limitada.",
+                "II": "Homogénea: Integración de operaciones relacionadas.",
+                "III": "Heterogénea: Integración de funciones diversas.",
+                "IV": "Amplia: Liderazgo estratégico."
+            },
+            "competencia_tecnica": {
+                "A": "Básico: Conocimientos elementales.",
+                "B": "Introductorio: Rutinas estandarizadas.",
+                "C": "General: Métodos y procedimientos especializados.",
+                "D": "Avanzado: Conocimiento especializado con base práctica.",
+                "E": "Especializado: Basado en teorías y contexto.",
+                "F": "Especialización Madura: Dominio profundo.",
+                "G": "Especialización Amplia: Autoridad reconocida.",
+                "H": "Referente: Liderazgo científico/innovador."
+            },
+            "comunicacion": {
+                "1": "Comunica: Intercambio básico de información.",
+                "2": "Razonamiento: Influencia con argumentos técnicos.",
+                "3": "Cambio de comportamientos: Liderazgo y motivación."
+            },
+            "puntajes": {
+                "A": { "1": 50, "2": 57, "3": 66 },
+                "B": { "1": 66, "2": 76, "3": 87 },
+                "C": { "1": 87, "2": 100, "3": 115 },
+                "D": { "1": 115, "2": 132, "3": 152 },
+                "E": { "1": 152, "2": 175, "3": 200 },
+                "F": { "1": 200, "2": 230, "3": 264 },
+                "G": { "1": 264, "2": 304, "3": 350 },
+                "H": { "1": 350, "2": 400, "3": 460 }
+            }
+        };
+
+        const solucionData = {
+            "complejidad": {
+                "1": "Repetitivo: Soluciones aprendidas.",
+                "2": "Con modelos: Elección entre alternativas conocidas.",
+                "3": "Variable: Identificación de patrones.",
+                "4": "Adaptación: Soluciones creativas.",
+                "5": "Sin precedentes: Innovación radical."
+            },
+            "marco_referencia": {
+                "A": "Rutina Estricta: Supervisión permanente.",
+                "B": "Rutina: Instrucciones detalladas.",
+                "C": "Semi-Rutina: Procedimientos diversificados.",
+                "D": "Estandarizado: Múltiples precedentes.",
+                "E": "Definición Clara: Políticas específicas.",
+                "F": "Definición Amplia: Objetivos amplios.",
+                "G": "Definición Genérica: Metas organizativas.",
+                "H": "Abstracto: Guía filosófica/estratégica."
+            },
+            "puntajes": {
+                "A": { "1": 50, "2": 57, "3": 66, "4": 76, "5": 87 },
+                "B": { "1": 66, "2": 76, "3": 87, "4": 100, "5": 115 },
+                "C": { "1": 87, "2": 100, "3": 115, "4": 132, "5": 152 },
+                "D": { "1": 115, "2": 132, "3": 152, "4": 175, "5": 200 },
+                "E": { "1": 152, "2": 175, "3": 200, "4": 230, "5": 264 },
+                "F": { "1": 200, "2": 230, "3": 264, "4": 304, "5": 350 },
+                "G": { "1": 264, "2": 304, "3": 350, "4": 400, "5": 460 },
+                "H": { "1": 350, "2": 400, "3": 460, "4": 530, "5": 610 }
+            }
+        };
+
+        const responsabilidadData = {
+            "libertad_actuar": {
+                "A": "Control Estricto: Supervisión permanente.",
+                "B": "Control: Instrucciones establecidas.",
+                "C": "Estandarizado: Procedimientos definidos.",
+                "D": "Regulación General: Políticas claras.",
+                "E": "Dirección: Gestión autónoma.",
+                "F": "Dirección General: Objetivos amplios.",
+                "G": "Guía: Orientación estratégica.",
+                "H": "Guía Estratégica: Tendencias del negocio."
+            },
+            "impacto": {
+                "N": "No cuantificada",
+                "1": "Muy pequeño",
+                "2": "Pequeño",
+                "3": "Medio",
+                "4": "Grande"
+            },
+            "puntajes": {
+                "A": { "N": 50, "1": 66, "2": 87, "3": 115, "4": 152 },
+                "B": { "N": 87, "1": 115, "2": 152, "3": 200, "4": 264 },
+                "C": { "N": 115, "1": 152, "2": 200, "3": 264, "4": 350 },
+                "D": { "N": 152, "1": 200, "2": 264, "3": 350, "4": 460 },
+                "E": { "N": 200, "1": 264, "2": 350, "3": 460, "4": 610 },
+                "F": { "N": 264, "1": 350, "2": 460, "3": 610, "4": 800 },
+                "G": { "N": 350, "1": 460, "2": 610, "3": 800, "4": 1050 },
+                "H": { "N": 460, "1": 610, "2": 800, "3": 1050, "4": 1400 }
+            }
+        };
+
+        // =============================================
+        // VARIABLES GLOBALES
+        // =============================================
+        let currentEvaluation = null;
+        const evaluationModel = {
+            id: null,
+            nombre: "",
+            descripcion: "",
+            responsabilidades: "",
+            funciones: "",
+            knowHow: {},
+            solucion: {},
+            responsabilidad: {},
+            total: 0,
+            hayScore: "",
+            fecha: null
+        };
+
+        // =============================================
+        // FUNCIONES DE NAVEGACIÓN
+        // =============================================
+        function showStep(step) {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            
+            // Mostrar paso actual
+            const stepEl = document.getElementById(`step-${step}`);
+            if (stepEl) {
+                stepEl.style.display = 'block';
+                setTimeout(() => {
+                    stepEl.classList.add('active');
+                }, 10);
+            }
+            
+            // Actualizar menú lateral
+            document.querySelectorAll('.menu li').forEach(el => el.classList.remove('active'));
+            const menuItem = document.querySelector(`.menu li[data-step="${step}"]`);
+            if (menuItem) menuItem.classList.add('active');
+            
+            // Actualizar barra de progreso (solo para pasos 1-4)
+            if (step >= 1 && step <= 4) {
+                document.getElementById('progress').style.width = `${(step-1)*33.33}%`;
+                document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+                document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+            }
+        }
+
+        function nextStep(step) {
+            // Validar campos obligatorios según el paso actual
+            let isValid = true;
+            
+            if (step === 2) {
+                isValid = validateStep1();
+            } else if (step === 3) {
+                isValid = validateStep2();
+            } else if (step === 4) {
+                isValid = validateStep3();
+            } else if (step === 'results') {
+                isValid = validateStep4();
+            }
+            
+            if (isValid) {
+                showStep(step);
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // =============================================
+        // VALIDACIONES DE FORMULARIOS
+        // =============================================
+        function validateStep1() {
+            const required = ['nombrePuesto', 'descripcion', 'responsabilidades'];
+            let isValid = true;
+            
+            required.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Por favor complete todos los campos obligatorios (*)');
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep2() {
+            const required = ['gerencial', 'tecnica', 'comunicacion'];
+            let isValid = true;
+            
+            required.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value) {
+                    field.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Por favor complete todos los campos de Know-How');
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep3() {
+            const required = ['complejidad', 'marco'];
+            let isValid = true;
+            
+            // Validar combinación imposible
+            const complejidad = document.getElementById('complejidad').value;
+            const marco = document.getElementById('marco').value;
+            
+            if (complejidad === '5' && marco === 'A') {
+                alert('¡Combinación inválida! No puede tener "Innovación radical" con "Rutina estricta"');
+                return false;
+            }
+            
+            required.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value) {
+                    field.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Por favor complete todos los campos de Solución de Problemas');
+                return false;
+            }
+            return true;
+        }
+
+        function validateStep4() {
+            const required = ['libertad', 'impacto'];
+            let isValid = true;
+            
+            required.forEach(id => {
+                const field = document.getElementById(id);
+                if (!field.value) {
+                    field.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Por favor complete todos los campos de Responsabilidad');
+                return false;
+            }
+            return true;
+        }
+
+        // =============================================
+        // CÁLCULOS HAY
+        // =============================================
+        function calcularKnowHow(gerencial, tecnica, comunicacion) {
+            const puntaje = knowHowData.puntajes[tecnica][comunicacion];
+            return {
+                gerencial: knowHowData.competencia_gerencial[gerencial],
+                tecnica: knowHowData.competencia_tecnica[tecnica],
+                comunicacion: knowHowData.comunicacion[comunicacion],
+                puntaje: puntaje
+            };
+        }
+
+        function calcularSolucionProblemas(complejidad, marco) {
+            const puntaje = solucionData.puntajes[marco][complejidad];
+            return {
+                complejidad: solucionData.complejidad[complejidad],
+                marco: solucionData.marco_referencia[marco],
+                puntaje: puntaje
+            };
+        }
+
+        function calcularResponsabilidad(libertad, impacto) {
+            const puntaje = responsabilidadData.puntajes[libertad][impacto];
+            return {
+                libertad: responsabilidadData.libertad_actuar[libertad],
+                impacto: responsabilidadData.impacto[impacto],
+                puntaje: puntaje
+            };
+        }
+
+        function determinarPerfilCorto(puntajeSolucion, puntajeKnowHow) {
+            const diferencia = puntajeSolucion - puntajeKnowHow;
+            
+            if (diferencia > 0) {
+                if (diferencia > 150) return 'P4';
+                if (diferencia > 100) return 'P3';
+                if (diferencia > 50) return 'P2';
+                return 'P1';
+            } else {
+                if (diferencia < -150) return 'A4';
+                if (diferencia < -100) return 'A3';
+                if (diferencia < -50) return 'A2';
+                return 'A1';
+            }
+        }
+
+        function determinarNivelHAY(total) {
+            if (total >= 2300) return "25 - Alta Dirección (Estratégico)";
+            if (total >= 1900) return "23-24 - Alta Dirección";
+            if (total >= 1500) return "20-22 - Gerentes Senior";
+            if (total >= 1100) return "17-19 - Gerentes Medios";
+            if (total >= 800) return "14-16 - Supervisores Senior";
+            if (total >= 500) return "11-13 - Supervisores";
+            if (total >= 300) return "8-10 - Operativos Avanzados";
+            return "1-7 - Operativos Básicos";
+        }
+
+        // =============================================
+        // FUNCIÓN PRINCIPAL DE CÁLCULO
+        // =============================================
+        function calcularResultados() {
+            if (!validateStep4()) return;
+            
+            // Obtener valores del formulario
+            const nombrePuesto = document.getElementById('nombrePuesto').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const responsabilidades = document.getElementById('responsabilidades').value;
+            const funciones = document.getElementById('funciones').value;
+            
+            const gerencial = document.getElementById('gerencial').value;
+            const tecnica = document.getElementById('tecnica').value;
+            const comunicacion = document.getElementById('comunicacion').value;
+            
+            const complejidad = document.getElementById('complejidad').value;
+            const marco = document.getElementById('marco').value;
+            
+            const libertad = document.getElementById('libertad').value;
+            const impacto = document.getElementById('impacto').value;
+            
+            // Calcular dimensiones
+            const knowHow = calcularKnowHow(gerencial, tecnica, comunicacion);
+            const solucion = calcularSolucionProblemas(complejidad, marco);
+            const responsabilidad = calcularResponsabilidad(libertad, impacto);
+            
+            // Calcular perfil
+            solucion.perfil = determinarPerfilCorto(solucion.puntaje, knowHow.puntaje);
+            
+            // Calcular total y nivel HAY
+            const total = knowHow.puntaje + solucion.puntaje + responsabilidad.puntaje;
+            const hayScore = determinarNivelHAY(total);
+            
+            // Guardar evaluación actual
+            currentEvaluation = {
+                id: Date.now(),
+                nombre: nombrePuesto,
+                descripcion: descripcion,
+                responsabilidades: responsabilidades,
+                funciones: funciones,
+                knowHow: knowHow,
+                solucion: solucion,
+                responsabilidad: responsabilidad,
+                total: total,
+                hayScore: hayScore,
+                fecha: new Date().toISOString()
+            };
+            
+            // Mostrar resultados
+            mostrarResultados();
+        }
+
+        function mostrarResultados() {
+            document.getElementById('result-nombre').textContent = currentEvaluation.nombre;
+            document.getElementById('result-total').textContent = currentEvaluation.total;
+            document.getElementById('result-hay').textContent = currentEvaluation.hayScore;
+            
+            document.getElementById('result-knowhow').textContent = 
+                `${currentEvaluation.knowHow.puntaje} pts (${currentEvaluation.knowHow.gerencial.split(':')[0].trim()})`;
+            
+            document.getElementById('result-solucion').textContent = 
+                `${currentEvaluation.solucion.puntaje} pts (${currentEvaluation.solucion.perfil})`;
+            
+            document.getElementById('result-responsabilidad').textContent = 
+                `${currentEvaluation.responsabilidad.puntaje} pts (${currentEvaluation.responsabilidad.libertad.split(':')[0].trim()})`;
+            
+            document.getElementById('result-perfil').textContent = 
+                currentEvaluation.solucion.perfil.includes('P') ? 'Perfil Estratégico' : 'Perfil Técnico';
+            
+            // Mostrar paso de resultados
+            showStep('results');
+        }
+
+        // =============================================
+        // GESTIÓN DE EVALUACIONES (CRUD)
+        // =============================================
+        function guardarEvaluacion() {
+            if (!currentEvaluation) {
+                alert('No hay evaluación para guardar. Calcule primero los resultados.');
+                return;
+            }
+            
+            let evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+            
+            // Si ya existe, actualizarla
+            const index = evaluaciones.findIndex(e => e.id === currentEvaluation.id);
+            if (index !== -1) {
+                evaluaciones[index] = currentEvaluation;
+            } else {
+                evaluaciones.push(currentEvaluation);
+            }
+            
+            localStorage.setItem('hayEvaluaciones', JSON.stringify(evaluaciones));
+            alert('Evaluación guardada correctamente!');
+            cargarHistorial();
+        }
+
+        function cargarHistorial() {
+            const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+            const list = document.getElementById('evaluations-list');
+            
+            list.innerHTML = evaluaciones.map(eval => `
+                <div class="eval-card">
+                    <h3>${eval.nombre}</h3>
+                    <small>${new Date(eval.fecha).toLocaleDateString('es-AR', { 
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit' 
+                    })}</small>
+                    <p><strong>Nivel HAY:</strong> ${eval.hayScore.split(' -')[0]}</p>
+                    <p>${eval.descripcion.substring(0, 80)}...</p>
+                    <div class="eval-actions">
+                        <button onclick="editarEvaluacion(${eval.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button onclick="generarPDF(${eval.id})">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button onclick="eliminarEvaluacion(${eval.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            showStep(5);
+        }
+
+        function editarEvaluacion(id) {
+            const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+            const eval = evaluaciones.find(e => e.id === id);
+            
+            if (eval) {
+                currentEvaluation = eval;
+                
+                // Llenar formularios
+                document.getElementById('nombrePuesto').value = eval.nombre;
+                document.getElementById('descripcion').value = eval.descripcion;
+                document.getElementById('responsabilidades').value = eval.responsabilidades;
+                document.getElementById('funciones').value = eval.funciones;
+                
+                // Mostrar primer paso
+                showStep(1);
+            }
+        }
+
+        function eliminarEvaluacion(id) {
+            if (confirm('¿Eliminar esta evaluación permanentemente?')) {
+                let evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+                evaluaciones = evaluaciones.filter(e => e.id !== id);
+                localStorage.setItem('hayEvaluaciones', JSON.stringify(evaluaciones));
+                cargarHistorial();
+            }
+        }
+
+        function buscarEvaluaciones() {
+            const term = document.getElementById('search-eval').value.toLowerCase();
+            const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+            
+            const filtered = term ? 
+                evaluaciones.filter(e => e.nombre.toLowerCase().includes(term)) : 
+                evaluaciones;
+            
+            const list = document.getElementById('evaluations-list');
+            list.innerHTML = filtered.map(eval => `
+                <div class="eval-card">
+                    <h3>${eval.nombre}</h3>
+                    <small>${new Date(eval.fecha).toLocaleDateString()}</small>
+                    <p>${eval.descripcion.substring(0, 80)}...</p>
+                    <div class="eval-actions">
+                        <button onclick="editarEvaluacion(${eval.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button onclick="generarPDF(${eval.id})">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button onclick="eliminarEvaluacion(${eval.id})">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // =============================================
+        // GENERACIÓN DE PDF
+        // =============================================
+        function generarPDF(id = null) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let evaluationData;
+            
+            if (id) {
+                const evaluaciones = JSON.parse(localStorage.getItem('hayEvaluaciones')) || [];
+                evaluationData = evaluaciones.find(e => e.id === id);
+            } else {
+                evaluationData = currentEvaluation;
+            }
+            
+            if (!evaluationData) {
+                alert('No se encontraron datos para generar el PDF');
+                return;
+            }
+            
+            // Configuración
+            doc.setProperties({
+                title: `Evaluación HAY - ${evaluationData.nombre}`,
+                subject: 'Evaluación de puesto metodología HAY',
+                author: 'Sistema HAY Evaluation'
+            });
+            
+            // Logo y título
+            doc.setFontSize(20);
+            doc.setTextColor(40, 40, 40);
+            doc.text('Evaluación HAY - Metodología de Puestos', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(16);
+            doc.text(`Puesto: ${evaluationData.nombre}`, 20, 35);
+            
+            // Información básica
+            doc.setFontSize(12);
+            doc.text(`Fecha: ${new Date(evaluationData.fecha).toLocaleDateString('es-AR')}`, 20, 45);
+            
+            // Descripción del puesto
+            doc.setFontSize(14);
+            doc.text('Descripción del Puesto:', 20, 60);
+            doc.setFontSize(12);
+            doc.text(`${evaluationData.descripcion}`, 20, 70, { maxWidth: 170 });
+            
+            // Responsabilidades
+            doc.setFontSize(14);
+            doc.text('Responsabilidades Clave:', 20, 90);
+            doc.setFontSize(12);
+            const responsabilidades = evaluationData.responsabilidades.split(';').map(r => r.trim());
+            responsabilidades.forEach((r, i) => {
+                doc.text(`• ${r}`, 25, 100 + (i * 7), { maxWidth: 165 });
+            });
+            
+            // Resultados (tabla)
+            doc.autoTable({
+                startY: 140,
+                head: [['Dimensión', 'Puntaje', 'Detalle']],
+                body: [
+                    ['Know-How', evaluationData.knowHow.puntaje, evaluationData.knowHow.gerencial],
+                    ['Solución Problemas', evaluationData.solucion.puntaje, evaluationData.solucion.complejidad],
+                    ['Responsabilidad', evaluationData.responsabilidad.puntaje, evaluationData.responsabilidad.libertad],
+                    ['TOTAL', evaluationData.total, evaluationData.hayScore]
+                ],
+                headStyles: {
+                    fillColor: [52, 73, 94], // Color dark
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                alternateRowStyles: {
+                    fillColor: [241, 241, 241]
+                },
+                margin: { top: 10 },
+                styles: {
+                    cellPadding: 5,
+                    fontSize: 11,
+                    valign: 'middle'
+                }
+            });
+            
+            // Guardar PDF
+            doc.save(`Evaluacion_HAY_${evaluationData.nombre.replace(/ /g, '_')}.pdf`);
+        }
+
+        // =============================================
+        // OTRAS FUNCIONALIDADES
+        // =============================================
+        function nuevaEvaluacion() {
+            currentEvaluation = null;
+            document.getElementById('evaluacionForm').reset();
+            showStep(1);
+        }
+
+        // =============================================
+        // INICIALIZACIÓN
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configurar tooltips
+            document.querySelectorAll('[data-tooltip]').forEach(el => {
+                el.addEventListener('mouseenter', showTooltip);
+                el.addEventListener('mouseleave', hideTooltip);
+            });
+            
+            // Mostrar primer paso
+            showStep(1);
+        });
+
+        function showTooltip(e) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip-element';
+            tooltip.textContent = e.target.getAttribute('data-tooltip');
+            
+            document.body.appendChild(tooltip);
+            
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + rect.width/2}px`;
+            tooltip.style.top = `${rect.top - 35}px`;
+            
+            setTimeout(() => {
+                tooltip.classList.add('visible');
+            }, 10);
+        }
+
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip-element');
+            if (tooltip) {
+                tooltip.classList.remove('visible');
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html>
