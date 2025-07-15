@@ -201,7 +201,7 @@ function validateCurrentStep(step) {
 }
 
 // =============================================
-// VALIDACIONES (TUS FUNCIONES ORIGINALES)
+// VALIDACIONES
 // =============================================
 
 function validateStep1() {
@@ -297,7 +297,7 @@ function validateStep4() {
 }
 
 // =============================================
-// CÁLCULOS HAY (TUS FUNCIONES ORIGINALES)
+// CÁLCULOS HAY
 // =============================================
 
 function calcularKnowHow(gerencial, tecnica, comunicacion) {
@@ -345,7 +345,7 @@ function determinarNivelHAY(total) {
 }
 
 // =============================================
-// FUNCIÓN PRINCIPAL DE CÁLCULO (TU CÓDIGO ORIGINAL)
+// FUNCIÓN PRINCIPAL DE CÁLCULO
 // =============================================
 
 function calcularResultados() {
@@ -418,7 +418,7 @@ function mostrarResultados() {
 }
 
 // =============================================
-// GESTIÓN DE EVALUACIONES (TU CÓDIGO ORIGINAL)
+// GESTIÓN DE EVALUACIONES
 // =============================================
 
 function guardarEvaluacion() {
@@ -526,7 +526,7 @@ function buscarEvaluaciones() {
 }
 
 // =============================================
-// GENERACIÓN DE PDF (TU CÓDIGO ORIGINAL)
+// GENERACIÓN DE PDF
 // =============================================
 
 function generarPDF(id = null) {
@@ -548,22 +548,47 @@ function generarPDF(id = null) {
     doc.setFontSize(16);
     doc.text(`Puesto: ${evaluationData.nombre}`, 20, 35);
     
-    // ... (resto de tu código original de generación PDF)
+    // Detalles de la evaluación
+    doc.setFontSize(12);
+    doc.text(`Descripción: ${evaluationData.descripcion}`, 20, 50);
+    doc.text(`Responsabilidades: ${evaluationData.responsabilidades}`, 20, 65);
+    doc.text(`Funciones: ${evaluationData.funciones}`, 20, 80);
+    
+    // Resultados
+    doc.setFontSize(14);
+    doc.text('Resultados de la Evaluación:', 20, 100);
+    
+    doc.text(`Know-How: ${evaluationData.knowHow.puntaje} pts`, 20, 115);
+    doc.text(`- ${evaluationData.knowHow.gerencial}`, 25, 125);
+    doc.text(`- ${evaluationData.knowHow.tecnica}`, 25, 135);
+    doc.text(`- ${evaluationData.knowHow.comunicacion}`, 25, 145);
+    
+    doc.text(`Solución de Problemas: ${evaluationData.solucion.puntaje} pts`, 20, 160);
+    doc.text(`- ${evaluationData.solucion.complejidad}`, 25, 170);
+    doc.text(`- ${evaluationData.solucion.marco}`, 25, 180);
+    
+    doc.text(`Responsabilidad: ${evaluationData.responsabilidad.puntaje} pts`, 20, 195);
+    doc.text(`- ${evaluationData.responsabilidad.libertad}`, 25, 205);
+    doc.text(`- Impacto: ${evaluationData.responsabilidad.impacto}`, 25, 215);
+    
+    // Resumen final
+    doc.setFontSize(16);
+    doc.text(`Puntaje Total: ${evaluationData.total}`, 20, 235);
+    doc.text(`Nivel HAY: ${evaluationData.hayScore}`, 20, 250);
+    doc.text(`Perfil: ${evaluationData.solucion.perfil.includes('P') ? 'Estratégico' : 'Técnico'}`, 20, 265);
+    
+    // Fecha
+    doc.setFontSize(10);
+    doc.text(`Evaluación generada el: ${new Date(evaluationData.fecha).toLocaleDateString()}`, 20, 280);
     
     doc.save(`Evaluacion_HAY_${evaluationData.nombre.replace(/ /g, '_')}.pdf`);
 }
 
 // =============================================
-// INICIALIZACIÓN (CON LAS MEJORAS INTEGRADAS)
+// INICIALIZACIÓN
 // =============================================
 
 function setupEventListeners() {
-    // Configurar tooltips
-    document.querySelectorAll('[data-tooltip]').forEach(el => {
-        el.addEventListener('mouseenter', showTooltip);
-        el.addEventListener('mouseleave', hideTooltip);
-    });
-    
     // Configurar botones de navegación
     document.getElementById('next-step-1').addEventListener('click', () => nextStep(2));
     document.getElementById('prev-step-2').addEventListener('click', () => prevStep(2));
@@ -573,6 +598,29 @@ function setupEventListeners() {
     document.getElementById('prev-step-4').addEventListener('click', () => prevStep(4));
     document.getElementById('calculate-results').addEventListener('click', calcularResultados);
     
+    // Botones de resultados
+    document.getElementById('save-evaluation').addEventListener('click', guardarEvaluacion);
+    document.getElementById('export-pdf').addEventListener('click', () => generarPDF());
+    document.getElementById('new-evaluation').addEventListener('click', () => {
+        currentEvaluation = null;
+        document.getElementById('nombrePuesto').value = '';
+        document.getElementById('descripcion').value = '';
+        document.getElementById('responsabilidades').value = '';
+        document.getElementById('funciones').value = '';
+        document.getElementById('gerencial').value = '';
+        document.getElementById('tecnica').value = '';
+        document.getElementById('comunicacion').value = '';
+        document.getElementById('complejidad').value = '';
+        document.getElementById('marco').value = '';
+        document.getElementById('libertad').value = '';
+        document.getElementById('impacto').value = '';
+        showStep('evaluation');
+        resetWizard();
+    });
+    
+    // Botón de búsqueda
+    document.getElementById('search-button').addEventListener('click', buscarEvaluaciones);
+    
     // Menú lateral
     document.querySelectorAll('.menu li').forEach(item => {
         item.addEventListener('click', function() {
@@ -580,14 +628,35 @@ function setupEventListeners() {
             showStep(step);
         });
     });
-}
-
-function showTooltip(e) {
-    // Tu implementación original de tooltips
-}
-
-function hideTooltip() {
-    // Tu implementación original de tooltips
+    
+    // Event listeners para descripciones dinámicas
+    document.getElementById('gerencial').addEventListener('change', function() {
+        document.getElementById('gerencial-desc').textContent = knowHowData.competencia_gerencial[this.value] || '';
+    });
+    
+    document.getElementById('tecnica').addEventListener('change', function() {
+        document.getElementById('tecnica-desc').textContent = knowHowData.competencia_tecnica[this.value] || '';
+    });
+    
+    document.getElementById('comunicacion').addEventListener('change', function() {
+        document.getElementById('comunicacion-desc').textContent = knowHowData.comunicacion[this.value] || '';
+    });
+    
+    document.getElementById('complejidad').addEventListener('change', function() {
+        document.getElementById('complejidad-desc').textContent = solucionData.complejidad[this.value] || '';
+    });
+    
+    document.getElementById('marco').addEventListener('change', function() {
+        document.getElementById('marco-desc').textContent = solucionData.marco_referencia[this.value] || '';
+    });
+    
+    document.getElementById('libertad').addEventListener('change', function() {
+        document.getElementById('libertad-desc').textContent = responsabilidadData.libertad_actuar[this.value] || '';
+    });
+    
+    document.getElementById('impacto').addEventListener('change', function() {
+        document.getElementById('impacto-desc').textContent = responsabilidadData.impacto[this.value] || '';
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -597,4 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manejar logo faltante
     const logo = document.querySelector('.logo');
     if (logo) logo.onerror = () => logo.style.display = 'none';
+    
+    // Cargar historial si existe
+    cargarHistorial();
 });

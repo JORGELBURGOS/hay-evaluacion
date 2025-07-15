@@ -49,20 +49,15 @@ body {
     padding: 20px;
     display: flex;
     align-items: center;
+    justify-content: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    height: 120px;
 }
 
 .logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 12px;
+    max-width: 100%;
+    max-height: 80px;
     object-fit: contain;
-}
-
-.app-name {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 18px;
 }
 
 .menu {
@@ -727,6 +722,11 @@ button {
         border-right: 1px solid rgba(255, 255, 255, 0.1);
         padding-right: 20px;
         margin-right: 20px;
+        height: auto;
+    }
+    
+    .logo {
+        height: 40px;
     }
     
     .menu {
@@ -798,5 +798,35 @@ button {
     .filter-options {
         flex-direction: column;
         gap: 10px;
+    }
+    
+    .result-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 576px) {
+    .wizard-progress {
+        padding: 10px;
+    }
+    
+    .wizard-content {
+        padding: 15px;
+    }
+    
+    .dimension-card {
+        padding: 15px;
+    }
+    
+    .result-summary {
+        padding: 15px;
+    }
+    
+    .history-container {
+        padding: 15px;
+    }
+    
+    .reports-container {
+        padding: 15px;
     }
 }
